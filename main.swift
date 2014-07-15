@@ -25,6 +25,7 @@ let obj:[String:AnyObject] = [
     "url":"http://blog.livedoor.com/dankogai/"
 ]
 
+
 let json = JSON(obj)
 let jstr = json.toString()
 jstr == JSON.parse(jstr).toString()             => println
@@ -42,7 +43,9 @@ object["int"].asInt         => println
 object["double"].asDouble   => println
 object["string"].asString   => println
 json["array"].asArray       => println
+json["array"].length        => println
 json["object"].asDictionary => println
+json["object"].length       => println
 for (k, v) in json["array"] {
     "[\"array\"][\(k)] =>\t\(v)"        => println
 }
@@ -82,4 +85,3 @@ var url = "http://api.dan.co.jp/asin/4534045220.json"
 JSON.fromURL(url).toString(pretty:true)    => println
 url = "http://api.dan.co.jp/nonexistent"
 JSON.fromURL(url).toString(pretty:true)    => println
-

@@ -162,6 +162,13 @@ class JSON {
         default: return nil
         }
     }
+    var length:Int {
+    switch _value {
+        case let o as NSArray:      return o.count
+        case let o as NSDictionary: return o.count
+        default: return 0
+        }
+    }
 }
 extension JSON : Sequence {
     func generate()->GeneratorOf<(AnyObject,JSON)> {
@@ -182,6 +189,9 @@ extension JSON : Sequence {
         default:
             return GeneratorOf<(AnyObject, JSON)>{ nil }
         }
+    }
+    func mutableCopyOfTheObject() -> AnyObject {
+        return _value.mutableCopy()
     }
 }
 extension JSON : Printable {
