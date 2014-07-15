@@ -3,6 +3,11 @@ swift-json
 
 Even Swiftier JSON Handler
 
+Usage
+-----
+
+Just add `json.swift` to your project and have fun!
+
 Synopsis
 --------
 
