@@ -9,9 +9,9 @@
 import Foundation
 
 class JSON {
-    let value:AnyObject
-    @required init(_ obj:AnyObject) { self.value = obj }
-    init(_ json:JSON){ self.value = json.value }
+    let _value:AnyObject
+    @required init(_ obj:AnyObject) { self._value = obj }
+    init(_ json:JSON){ self._value = json._value }
     class func parse(str:String)->JSON {
         var err:NSError?
         let enc = NSUTF8StringEncoding
@@ -40,7 +40,7 @@ class JSON {
     typealias NSNull = Foundation.NSNull
     class var null:NSNull { return NSNull() }
     var typeOf:String {
-        switch value {
+        switch _value {
         case is NSNull:                 return "NSNull"
         case let o as NSNumber:
             switch o.objCType {
@@ -57,7 +57,7 @@ class JSON {
         }
     }
     subscript(idx:Int) -> JSON {
-        switch value {
+        switch _value {
         case let err as NSError:
             return JSON(err)
         case let ary as NSArray:
@@ -77,7 +77,7 @@ class JSON {
             }
     }
     subscript(key:String)->JSON {
-        switch value {
+        switch _value {
         case let err as NSError:
             return JSON(err)
         case let dic as NSDictionary:
@@ -95,10 +95,10 @@ class JSON {
         }
     }
     var asNull:NSNull? {
-        return value is NSNull ? NSNull() : nil
+        return _value is NSNull ? NSNull() : nil
     }
     var asBool:Bool? {
-        switch value {
+        switch _value {
         case let o as NSNumber:
             switch o.objCType {
             case "c", "C":
@@ -110,7 +110,7 @@ class JSON {
         }
     }
     var asInt:Int? {
-        switch value {
+        switch _value {
         case let o as NSNumber:
             switch o.objCType {
             case "c", "C":
@@ -122,7 +122,7 @@ class JSON {
         }
     }
     var asDouble:Double? {
-        switch value {
+        switch _value {
         case let o as NSNumber:
             switch o.objCType {
             case "c", "C":
@@ -134,21 +134,21 @@ class JSON {
         }
     }
     var asString:String? {
-        switch value {
+        switch _value {
         case let o as NSString:
             return String(o)
         default: return nil
         }
     }
     var count:Int {
-        switch value {
+        switch _value {
         case let o as NSArray:      return o.count
         case let o as NSDictionary: return o.count
         default:                    return 0
         }
     }
     var keys:[String] {
-        switch value {
+        switch _value {
         case let o as NSDictionary:
             var result = [String]()
             for (k:AnyObject,_) in o { result += k as String }
@@ -162,7 +162,7 @@ extension JSON : Sequence {
     func generate()->GeneratorOf<(AnyObject,JSON)> {
         let count = self.count
         var i = -1
-        switch value {
+        switch _value {
         case let o as NSArray:
             return GeneratorOf<(AnyObject, JSON)> {
                 if ++i == count { return nil }
@@ -181,8 +181,8 @@ extension JSON : Sequence {
 }
 extension JSON : Printable {
     func toString(pretty:Bool=false)->String {
-        switch value {
-        case is NSError: return "\(value)"
+        switch _value {
+        case is NSError: return "\(_value)"
         case is NSNull: return "null"
         case let o as NSNumber:
             switch o.objCType {
@@ -211,7 +211,7 @@ extension JSON : Printable {
         default:
             let opts = pretty ? NSJSONWritingOptions.PrettyPrinted : nil
             let data = NSJSONSerialization.dataWithJSONObject(
-                value, options:opts, error:nil
+                _value, options:opts, error:nil
             )
             return NSString(
                 data:data, encoding:NSUTF8StringEncoding

@@ -56,7 +56,7 @@ json["wrong_key"][Int.max]["wrong_name"]    => println
 //// schema by subclassing
 class MyJSON : JSON {
     init(_ obj:AnyObject){ super.init(obj) }
-    init(_ json:JSON) { super.init(json) }
+    init(_ json:JSON)  { super.init(json) }
     var null  :NSNull? { return self["null"].asNull }
     var bool  :Bool?   { return self["bool"].asBool }
     var int   :Int?    { return self["int"].asInt }
