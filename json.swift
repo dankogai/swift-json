@@ -11,6 +11,7 @@ import Foundation
 class JSON {
     let value:AnyObject
     @required init(_ obj:AnyObject) { self.value = obj }
+    init(_ json:JSON){ self.value = json.value }
     class func parse(str:String)->JSON {
         var err:NSError?
         let enc = NSUTF8StringEncoding
