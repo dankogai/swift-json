@@ -95,8 +95,15 @@ class JSON {
                 ]))
         }
     }
+    var asError:NSError? {
+        switch _value {
+        case let o as NSError: return o
+        default: return nil
+        }
+
+    }
     var asNull:NSNull? {
-        return _value is NSNull ? NSNull() : nil
+        return _value is NSNull ? JSON.null : nil
     }
     var asBool:Bool? {
         switch _value {
