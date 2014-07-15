@@ -29,13 +29,22 @@ let obj:[String:AnyObject] = [
 ]
 
 let json = JSON(obj)
-json.toString() // {"int":42,"double":3.141592653589793,"string":"a α\t弾\n𪚲","object":{},"null":null,"bool":true,"array":[]}
+json.toString() // "{\"array\":[null,false,0,\"\",[],{}],
+    \"object\":{\"int\":42,\"double\":3.141592653589793,
+    \"string\":\"a α\t弾\n𪚲\",\"object\":{},\"null\":null,
+    \"bool\":true,\"array\":[]},
+    \"url\":\"http://blog.livedoor.com/dankogai/\"}"
 ````
 
 ...or string...
 
 ````swift
-let json = JSON.stringify("{\"int\":42,\"double\":3.141592653589793,\"string\":\"a α\t弾\n𪚲\",\"object\":{},\"null\":null,\"bool\":true,\"array\":[]}")
+let json = JSON.stringify("{\"array\":[null,false,0,\"\",[],{}],
+    \"object\":{\"int\":42,\"double\":3.141592653589793,
+    \"string\":\"a α\t弾\n𪚲\",\"object\":{},\"null\":null,
+    \"bool\":true,\"array\":[]},
+    \"url\":\"http://blog.livedoor.com/dankogai/\"}"
+)
 ````
 
 ...or URL.
