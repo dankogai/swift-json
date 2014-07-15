@@ -38,6 +38,7 @@ class JSON {
         return self(obj).toString(pretty:pretty)
     }
     typealias NSNull = Foundation.NSNull
+    typealias NSError = Foundation.NSError
     class var null:NSNull { return NSNull() }
     var typeOf:String {
         switch _value {
@@ -51,8 +52,8 @@ class JSON {
                 
         }
         case is NSString:               return "String"
-        case is NSArray:                return "NSArray"
-        case is NSDictionary:           return "NSDictionary"
+        case is NSArray:                return "Array"
+        case is NSDictionary:           return "Dictionary"
         default:                        return "NSError"
         }
     }
@@ -140,39 +141,43 @@ class JSON {
         default: return nil
         }
     }
-    var count:Int {
+    var asArray:[JSON]? {
         switch _value {
-        case let o as NSArray:      return o.count
-        case let o as NSDictionary: return o.count
-        default:                    return 0
-        }
-    }
-    var keys:[String] {
-        switch _value {
-        case let o as NSDictionary:
-            var result = [String]()
-            for (k:AnyObject,_) in o { result += k as String }
+        case let o as NSArray:
+            var result = [JSON]()
+            for v:AnyObject in o { result += JSON(v) }
             return result
         default:
-            return []
+            return nil
+        }
+    }
+    var asDictionary:[String:JSON]? {
+        switch _value {
+        case let o as NSDictionary:
+            var result = [String:JSON]()
+            for (k:AnyObject, v:AnyObject) in o {
+                result[k as String] = JSON(v)
+            }
+            return result
+        default: return nil
         }
     }
 }
 extension JSON : Sequence {
     func generate()->GeneratorOf<(AnyObject,JSON)> {
-        let count = self.count
-        var i = -1
         switch _value {
         case let o as NSArray:
+            var i = -1
             return GeneratorOf<(AnyObject, JSON)> {
-                if ++i == count { return nil }
-                return (i as AnyObject, JSON(o[i]))
+                if ++i == o.count { return nil }
+                return (i, JSON(o[i]))
             }
         case let o as NSDictionary:
-            var ks = self.keys
+            var ks = o.allKeys!.reverse()
         return GeneratorOf<(AnyObject, JSON)> {
-                if ++i == count { return nil }
-                return (ks[i] as AnyObject, JSON(o[ks[i]]))
+                if ks.isEmpty { return nil }
+                let k = ks.removeLast() as String
+                return (k, JSON(o.valueForKey(k)))
             }
         default:
             return GeneratorOf<(AnyObject, JSON)>{ nil }

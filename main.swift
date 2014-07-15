@@ -33,16 +33,16 @@ json.toString(pretty: true)                     => println
 json["object"]                                  => println
 json["object"]["array"]                         => println
 json["object"]["array"][0]                      => println
-json["object"]["array"].count                   => println
 json["object"]["object"][""]                    => println
-json.keys                                       => println
-json.count                                      => println
+json["array"]                                   => println
 let object = json["object"]
 object["null"].asNull       => println
 object["bool"].asBool       => println
 object["int"].asInt         => println
 object["double"].asDouble   => println
 object["string"].asString   => println
+json["array"].asArray       => println
+json["object"].asDictionary => println
 for (k, v) in json["array"] {
     "[\"array\"][\(k)] =>\t\(v)"        => println
 }
@@ -67,16 +67,16 @@ class MyJSON : JSON {
     var object:MyJSON  { return MyJSON(self["object"]) }
 }
 let myjson = MyJSON(obj)
-myjson.toString() == jstr               => println
-myjson.object                           => println
-myjson.object.array                     => println
-myjson.array                            => println
-myjson.object.null      => println
-myjson.object.bool      => println
-myjson.object.int       => println
-myjson.object.double    => println
-myjson.object.string    => println
-myjson.url              => println
+myjson.toString() == jstr   => println
+myjson.object               => println
+myjson.object.array         => println
+myjson.array                => println
+myjson.object.null          => println
+myjson.object.bool          => println
+myjson.object.int           => println
+myjson.object.double        => println
+myjson.object.string        => println
+myjson.url                  => println
 ////
 var url = "http://api.dan.co.jp/asin/4534045220.json"
 JSON.fromURL(url).toString(pretty:true)    => println
