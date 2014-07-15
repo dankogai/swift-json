@@ -36,6 +36,7 @@ class JSON {
     class func stringify(obj:AnyObject, pretty:Bool=false) -> String {
         return self(obj).toString(pretty:pretty)
     }
+    typealias NSNull = Foundation.NSNull
     class var null:NSNull { return NSNull() }
     var typeOf:String {
         switch value {

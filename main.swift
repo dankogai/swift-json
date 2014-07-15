@@ -55,16 +55,23 @@ for (k, v) in json["url"] {
 json["wrong_key"][Int.max]["wrong_name"]    => println
 class MyJSON : JSON {
     init(_ obj:AnyObject){ super.init(obj) }
-    var array :MyJSON { return MyJSON(self["array"].value)  }
-    var object:MyJSON { return MyJSON(self["object"].value) }
+    var null  :NSNull? { return self["null"].asNull }
+    var bool  :Bool?   { return self["bool"].asBool }
+    var int   :Int?    { return self["int"].asInt }
+    var double:Double? { return self["double"].asDouble }
+    var string:String? { return self["string"].asString }
+    var url:   String? { return self["url"].asString }
+    var array :MyJSON  { return MyJSON(self["array"].value)  }
+    var object:MyJSON  { return MyJSON(self["object"].value) }
 }
 let myjson = MyJSON(obj)
 myjson.toString() == jstr               => println
 myjson.object                           => println
 myjson.object.array                     => println
 myjson.array                            => println
-
-var url = "http://api.dan.co.jp/asin/4534045220.json"
-JSON.fromURL(url).toString(pretty:true)    => println
-url = "http://api.dan.co.jp/nonexistent"
-JSON.fromURL(url).toString(pretty:true)    => println
+myjson.object.null      => println
+myjson.object.bool      => println
+myjson.object.int       => println
+myjson.object.double    => println
+myjson.object.string    => println
+myjson.url              => println
