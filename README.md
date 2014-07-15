@@ -111,12 +111,12 @@ Now do:
 
 ````swift
 let myjson = MyJSON(obj)
-myjson.object.null.asNull
-myjson.object.bool.asBool
-myjson.object.int.asInt
-myjson.object.double.asDouble
-myjson.object.string.asString
-myjson.url
+myjson.object.null      // NSNull?
+myjson.object.bool      // Bool?
+myjson.object.int       // Int?
+myjson.object.double    // Double?
+myjson.object.string    // String?
+myjson.url              // String?
 ````
 
 This approach comes with bonus.  You can't accidentaly access elements that was not supposed to there.  JSON is schemaless and that is what makes JSON rule today.  But that is also what makes JSON so prone to error.   With Swift and this `JSON` class you get the best of both worlds -- flexibility of JSON and robustness of static typing.
