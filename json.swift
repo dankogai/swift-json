@@ -60,7 +60,7 @@ class JSON {
     subscript(idx:Int) -> JSON {
         switch _value {
         case let err as NSError:
-            return JSON(err)
+            return self
         case let ary as NSArray:
             if 0 <= idx && idx < ary.count {
                 return JSON(ary[idx]!)
@@ -80,7 +80,7 @@ class JSON {
     subscript(key:String)->JSON {
         switch _value {
         case let err as NSError:
-            return JSON(err)
+            return self
         case let dic as NSDictionary:
             if let val:AnyObject = dic[key] { return JSON(val) }
             return JSON(NSError(
@@ -96,11 +96,7 @@ class JSON {
         }
     }
     var asError:NSError? {
-        switch _value {
-        case let o as NSError: return o
-        default: return nil
-        }
-
+        return _value as? NSError
     }
     var asNull:NSNull? {
         return _value is NSNull ? JSON.null : nil

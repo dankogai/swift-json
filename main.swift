@@ -83,5 +83,11 @@ myjson.url                  => println
 ////
 var url = "http://api.dan.co.jp/asin/4534045220.json"
 JSON.fromURL(url).toString(pretty:true)    => println
-url = "http://api.dan.co.jp/nonexistent"
-JSON.fromURL(url).toString(pretty:true)    => println
+//url = "http://api.dan.co.jp/nonexistent"
+//JSON.fromURL(url).toString(pretty:true)    => println
+if let b = json["noexistent"][1234567890]["entry"].asBool {
+    println(b);
+} else {
+    let e = json["noexistent"][1234567890]["entry"].asError
+    println(e)
+}
