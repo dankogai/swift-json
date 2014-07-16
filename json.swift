@@ -220,12 +220,8 @@ extension JSON : Printable {
                 }
             }
         case let o as NSString:
-            var s = ""
-            for u in String(o).unicodeScalars {
-                s += u.isASCII()
-                    ? u.escape(asASCII: false) : String(u)
-            }
-            return "\"" + s + "\""
+            return o.debugDescription
+
         default:
             let opts = pretty ? NSJSONWritingOptions.PrettyPrinted : nil
             let data = NSJSONSerialization.dataWithJSONObject(
