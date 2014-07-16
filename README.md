@@ -40,7 +40,7 @@ json.toString()
 ...or string...
 
 ````swift
-let json = JSON.stringify("{\"array\":[...}")
+let json = JSON.parse("{\"array\":[...}")
 ````
 
 ...or URL.
