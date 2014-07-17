@@ -10,17 +10,23 @@ import Foundation
 
 class JSON {
     let _value:AnyObject
+    /// pass the object that was returned from
+    /// NSJSONSerialization
     @required init(_ obj:AnyObject) { self._value = obj }
+    /// pass the JSON object for another instance
     init(_ json:JSON){ self._value = json._value }
+    /// pases string to the JSON object
     class func parse(str:String)->JSON {
         var err:NSError?
         let enc = NSUTF8StringEncoding
         var obj:AnyObject? = NSJSONSerialization.JSONObjectWithData(
             str.dataUsingEncoding(enc), options:nil, error:&err
         )
+
         if err { return self(err!) }
         else   { return self(obj!) }
     }
+    /// fetch the JSON string from NSURL
     class func fromNSURL(nsurl:NSURL) -> JSON {
         var enc:NSStringEncoding = NSUTF8StringEncoding
         var err:NSError?
@@ -31,15 +37,21 @@ class JSON {
         if err { return self(err!) }
         else   { return self.parse(str!) }
     }
+    /// fetch the JSON string from URL in the string
     class func fromURL(url:String) -> JSON {
         return self.fromNSURL(NSURL.URLWithString(url))
     }
+    /// does what JSON.stringify in ES5 does.
+    /// when the 2nd argument is set to true it pretty prints
     class func stringify(obj:AnyObject, pretty:Bool=false) -> String {
         return self(obj).toString(pretty:pretty)
     }
     typealias NSNull = Foundation.NSNull
     typealias NSError = Foundation.NSError
     class var null:NSNull { return NSNull() }
+    /// Gives the type name as string.
+    /// e.g.  if it returns "Double" 
+    ///       .asDouble returns Double
     var typeOf:String {
         switch _value {
         case is NSNull:                 return "NSNull"
@@ -57,6 +69,7 @@ class JSON {
         default:                        return "NSError"
         }
     }
+    /// access the element like array
     subscript(idx:Int) -> JSON {
         switch _value {
         case let err as NSError:
@@ -77,6 +90,7 @@ class JSON {
                 ]))
             }
     }
+    /// access the element like dictionary
     subscript(key:String)->JSON {
         switch _value {
         case let err as NSError:
@@ -95,12 +109,15 @@ class JSON {
                 ]))
         }
     }
+    /// gives NSError if it holds the error. nil otherwise
     var asError:NSError? {
         return _value as? NSError
     }
+    /// gives NSNull if self holds it. nil otherwise
     var asNull:NSNull? {
         return _value is NSNull ? JSON.null : nil
     }
+    /// gives Bool if self holds it. nil otherwise
     var asBool:Bool? {
         switch _value {
         case let o as NSNumber:
@@ -113,6 +130,7 @@ class JSON {
         default: return nil
         }
     }
+    /// gives Int if self holds it. nil otherwise
     var asInt:Int? {
         switch _value {
         case let o as NSNumber:
@@ -125,6 +143,7 @@ class JSON {
         default: return nil
         }
     }
+    /// gives Double if self holds it. nil otherwise
     var asDouble:Double? {
         switch _value {
         case let o as NSNumber:
@@ -137,6 +156,7 @@ class JSON {
         default: return nil
         }
     }
+    /// gives String if self holds it. nil otherwise
     var asString:String? {
         switch _value {
         case let o as NSString:
@@ -144,6 +164,8 @@ class JSON {
         default: return nil
         }
     }
+    /// if self holds NSArray, gives a [JSON]
+    /// with elements therein. nil otherwise
     var asArray:[JSON]? {
         switch _value {
         case let o as NSArray:
@@ -154,6 +176,8 @@ class JSON {
             return nil
         }
     }
+    /// if self holds NSDictionary, gives a [String:JSON]
+    /// with elements therein. nil otherwise
     var asDictionary:[String:JSON]? {
         switch _value {
         case let o as NSDictionary:
@@ -165,6 +189,8 @@ class JSON {
         default: return nil
         }
     }
+    /// gives the number of elements if an array or a dictionary.
+    /// you can use this to check if you can iterate.
     var length:Int {
     switch _value {
         case let o as NSArray:      return o.count
@@ -198,6 +224,8 @@ extension JSON : Sequence {
     }
 }
 extension JSON : Printable {
+    /// stringifies self.
+    /// if pretty:true it pretty prints
     func toString(pretty:Bool=false)->String {
         switch _value {
         case is NSError: return "\(_value)"

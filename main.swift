@@ -25,7 +25,6 @@ let obj:[String:AnyObject] = [
     "url":"http://blog.livedoor.com/dankogai/"
 ]
 
-
 let json = JSON(obj)
 let jstr = json.toString()
 jstr == JSON.parse(jstr).toString()             => println
