@@ -59,7 +59,9 @@ json["object"]["bool"].asBool       // true
 json["object"]["int"].asInt         // 42
 json["object"]["double"].asDouble   // 3.141592653589793
 json["object"]["string"].asString   // "a α\t弾\n𪚲"
+````
 
+````swift
 json["array"][0].asNull             // NSNull()
 json["array"][1].asBool             // false
 json["array"][2].asInt              // 0
