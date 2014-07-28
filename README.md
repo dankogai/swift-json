@@ -112,6 +112,22 @@ json["object"]["string"].type       // "String"
 json["object"]["string"].isString   // true
 ````
 
+### Iterating Nodes
+
+Note that the iterator yields `(k, v)` pair for both array and dictionary:
+
+````swift
+for (i, v) in json["array"] {
+   // i is NSNumber, v is another JSON object
+}
+````
+
+````swift
+for (k, v) in json["object"] {
+   // k is NSString, v is another JSON object
+}
+````
+
 
 ### Custom Accessors via Inheritance
 
