@@ -68,6 +68,8 @@ json["array"][2].asInt              // 0
 json["array"][3].asString           // ""
 ````
 
+#### Error handling
+
 Don't worry if the subscripted entry does not exist.  Just like [SwiftyJSON] it simply turns into the error object.  Call that NSError Chain :-?
 
 [SwiftyJSON]: https://github.com/lingoer/SwiftyJSON
@@ -79,6 +81,37 @@ if let b = json["noexistent"][1234567890]["entry"].asBool {
     println(e)
 } // Error Domain=JSONErrorDomain Code=404 "["noexistent"] not found" UserInfo=0x10064bfc0 {NSLocalizedDescription=["noexistent"] not found}
 ````
+
+### Type Checking
+
+What you see is what you get.
+
+````swift
+json["array"].type                  // "Array"
+json["array"].isDictionary          // true
+json["array"].isLeaf                // false
+json["object"].type                 // "Dictionary"
+json["object"].isDictionary         // true
+json["object"].isLeaf               // false
+json["url"].isLeaf                  // true
+````
+
+````swift
+json["object"]["null"].type         // "NSNull"
+json["object"]["null"].isNull       // true
+json["object"]["bool"].type         // "Bool"
+json["object"]["bool"].isBool       // true
+json["object"]["bool"].isNumber     // false
+json["object"]["int"].type          // "Int"
+json["object"]["int"].isInt         // 42
+json["object"]["int"].isNumber      // true
+json["object"]["double"].type       // "Double"
+json["object"]["double"].isDouble   // true
+json["object"]["double"].isNumber   // true
+json["object"]["string"].type       // "String"
+json["object"]["string"].isString   // true
+````
+
 
 ### Custom Accessors via Inheritance
 
