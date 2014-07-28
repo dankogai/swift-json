@@ -15,7 +15,7 @@ Turn your swift object to JSON like so:
 
 ````swift
 let obj:[String:AnyObject] = [
-    "array": [JSON.null, false, 0, "",[],[:]],
+    "array": [JSON.null, false, 0, "", [], [:]],
     "object":[
         "null":   JSON.null,
         "bool":   true,
@@ -127,4 +127,6 @@ This approach comes with bonus.  You can't accidentaly access elements that was 
 Description
 ===========
 
-TBD.
+See [wiki/Discussion].
+
+[wiki/Discussion]: https://github.com/dankogai/swift-json/wiki/Discussion
