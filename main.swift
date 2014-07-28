@@ -12,7 +12,7 @@ operator infix => { associativity left precedence 95 }
 }
 //let the show begin!
 let obj:[String:AnyObject] = [
-    "array": [JSON.null, false, 0, "",[],[:]],
+    "array": [JSON.null, false, 0, "", [], [:]],
     "object":[
         "null":   JSON.null,
         "bool":   true,
@@ -36,13 +36,19 @@ json["object"]["array"][0]              => println
 json["object"]["object"][""]            => println
 json["array"]                           => println
 let object = json["object"]
+object["null"].isNull       => println
 object["null"].asNull       => println
+object["bool"].isBool       => println
 object["bool"].asBool       => println
+object["int"].isInt         => println
 object["int"].asInt         => println
+object["double"].isDouble   => println
 object["double"].asDouble   => println
 object["string"].asString   => println
+json["array"].isArray       => println
 json["array"].asArray       => println
 json["array"].length        => println
+json["object"].isDictionary => println
 json["object"].asDictionary => println
 json["object"].length       => println
 for (k, v) in json["array"] {

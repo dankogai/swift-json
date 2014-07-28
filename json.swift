@@ -5,7 +5,6 @@
 //  Created by Dan Kogai on 7/15/14.
 //  Copyright (c) 2014 Dan Kogai. All rights reserved.
 //
-
 import Foundation
 /// init
 public class JSON {
@@ -55,26 +54,6 @@ extension JSON {
 }
 /// instance properties
 extension JSON {
-    /// Gives the type name as string.
-    /// e.g.  if it returns "Double"
-    ///       .asDouble returns Double
-    public var typeOf:String {
-    switch _value {
-    case is NSError:        return "NSError"
-    case is NSNull:         return "NSNull"
-    case let o as NSNumber:
-        switch String.fromCString(o.objCType)! {
-        case "c", "C":              return "Bool"
-        case "q", "l", "i", "s":    return "Int"
-        case "Q", "L", "I", "S":    return "UInt"
-        default:                    return "Double"
-        }
-    case is NSString:               return "String"
-    case is NSArray:                return "Array"
-    case is NSDictionary:           return "Dictionary"
-    default:                        return "NSError"
-        }
-    }
     /// access the element like array
     public subscript(idx:Int) -> JSON {
         switch _value {
@@ -97,7 +76,7 @@ extension JSON {
             }
     }
     /// access the element like dictionary
-    subscript(key:String)->JSON {
+    public subscript(key:String)->JSON {
         switch _value {
         case let err as NSError:
             return self
@@ -114,6 +93,56 @@ extension JSON {
                     NSLocalizedDescriptionKey: "not an object"
                 ]))
             }
+    }
+    /// Gives the type name as string.
+    /// e.g.  if it returns "Double"
+    ///       .asDouble returns Double
+    public var type:String {
+    switch _value {
+    case is NSError:        return "NSError"
+    case is NSNull:         return "NSNull"
+    case let o as NSNumber:
+        switch String.fromCString(o.objCType)! {
+        case "c", "C":              return "Bool"
+        case "q", "l", "i", "s":    return "Int"
+        case "Q", "L", "I", "S":    return "UInt"
+        default:                    return "Double"
+        }
+    case is NSString:               return "String"
+    case is NSArray:                return "Array"
+    case is NSDictionary:           return "Dictionary"
+    default:                        return "NSError"
+        }
+    }
+    /// check if self is NSError
+    public var isError:      Bool { return _value is NSError }
+    /// check if self is NSNull
+    public var isNull:       Bool { return _value is NSNull }
+    /// check if self is Bool
+    public var isBool:       Bool { return type == "Bool" }
+    /// check if self is Int
+    public var isInt:        Bool { return type == "Int" }
+    /// check if self is UInt
+    public var isUInt:       Bool { return type == "UInt" }
+    /// check if self is Double
+    public var isDouble:     Bool { return type == "Double" }
+    /// check if self is any type of number
+    public var isNumber:     Bool {
+    if let o = _value as? NSNumber {
+        let t = String.fromCString(o.objCType)!
+        return  t == "c" || t == "C"
+    }
+    return false
+    }
+    /// check if self is String
+    public var isString:     Bool { return _value is NSString }
+    /// check if self is Array
+    public var isArray:      Bool { return _value is NSArray }
+    /// check if self is Dictionary
+    public var isDictionary: Bool { return _value is NSDictionary }
+    /// check if self is a valid leaf node.
+    public var isLeaf:       Bool {
+        return !(isArray || isDictionary || isError)
     }
     /// gives NSError if it holds the error. nil otherwise
     public var asError:NSError? {
@@ -161,6 +190,8 @@ extension JSON {
     default: return nil
         }
     }
+    // an alias to asDouble
+    public var asNumber:Double? { return asDouble }
     /// gives String if self holds it. nil otherwise
     public var asString:String? {
     switch _value {
@@ -267,4 +298,3 @@ extension JSON : Printable {
     }
     public var description:String { return toString() }
 }
-
