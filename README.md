@@ -145,8 +145,8 @@ Yes, we can!
 ````swift
 //// schema by subclassing
 class MyJSON : JSON {
-    init(_ obj:AnyObject){ super.init(obj) }
-    init(_ json:JSON)  { super.init(json) }
+    override init(_ obj:AnyObject){ super.init(obj) }
+    override init(_ json:JSON)  { super.init(json) }
     var null  :NSNull? { return self["null"].asNull }
     var bool  :Bool?   { return self["bool"].asBool }
     var int   :Int?    { return self["int"].asInt }
