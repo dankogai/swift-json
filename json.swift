@@ -27,8 +27,7 @@ extension JSON {
         var obj:AnyObject? = NSJSONSerialization.JSONObjectWithData(
             str.dataUsingEncoding(enc), options:nil, error:&err
         )
-        if err { return JSON(err!) }
-        else   { return JSON(obj!) }
+        return err != nil ? JSON(err!) : JSON(obj!)
     }
     /// fetch the JSON string from NSURL
     public class func fromNSURL(nsurl:NSURL) -> JSON {
@@ -38,8 +37,7 @@ extension JSON {
         NSString.stringWithContentsOfURL(
             nsurl, usedEncoding:&enc, error:&err
         )
-        if err { return JSON(err!) }
-        else   { return JSON.parse(str!) }
+        return err != nil ? JSON(err!) : JSON.parse(str!)
     }
     /// fetch the JSON string from URL in the string
     public class func fromURL(url:String) -> JSON {
@@ -196,7 +194,7 @@ extension JSON {
     public var asString:String? {
     switch _value {
     case let o as NSString:
-        return String(o)
+        return o as String
     default: return nil
         }
     }
@@ -206,7 +204,7 @@ extension JSON {
     switch _value {
     case let o as NSArray:
         var result = [JSON]()
-        for v:AnyObject in o { result += JSON(v) }
+        for v:AnyObject in o { result.append(JSON(v)) }
         return result
     default:
         return nil
@@ -235,7 +233,7 @@ extension JSON {
         }
     }
 }
-extension JSON : Sequence {
+extension JSON : SequenceType {
     public func generate()->GeneratorOf<(AnyObject,JSON)> {
         switch _value {
         case let o as NSArray:

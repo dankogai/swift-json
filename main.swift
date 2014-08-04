@@ -6,8 +6,8 @@
 // Copyright (c) 2014 Dan Kogai. All rights reserved.
 //
 //for convenience
-operator infix => { associativity left precedence 95 }
-@infix func => <A,R> (lhs:A, rhs:A->R)->R {
+infix operator => { associativity left precedence 95 }
+func => <A,R> (lhs:A, rhs:A->R)->R {
     return rhs(lhs)
 }
 //let the show begin!
@@ -70,8 +70,8 @@ if let b = json["noexistent"][1234567890]["entry"].asBool {
 }
 ////  schema by subclassing
 class MyJSON : JSON {
-    init(_ obj:AnyObject){ super.init(obj) }
-    init(_ json:JSON)  { super.init(json) }
+    override init(_ obj:AnyObject){ super.init(obj) }
+    override init(_ json:JSON)  { super.init(json) }
     var null  :NSNull? { return self["null"].asNull }
     var bool  :Bool?   { return self["bool"].asBool }
     var int   :Int?    { return self["int"].asInt }
