@@ -23,7 +23,7 @@ extension JSON {
     /// pases string to the JSON object
     public class func parse(str:String)->JSON {
         var err:NSError?
-        let enc = NSUTF8StringEncoding
+        let enc:NSStringEncoding = NSUTF8StringEncoding
         var obj:AnyObject? = NSJSONSerialization.JSONObjectWithData(
             str.dataUsingEncoding(enc), options:nil, error:&err
         )
