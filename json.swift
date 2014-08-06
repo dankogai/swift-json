@@ -128,7 +128,7 @@ extension JSON {
     public var isNumber:     Bool {
     if let o = _value as? NSNumber {
         let t = String.fromCString(o.objCType)!
-        return  t == "c" || t == "C"
+        return  t != "c" && t != "C"
     }
     return false
     }
