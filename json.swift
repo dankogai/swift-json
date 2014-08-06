@@ -223,6 +223,17 @@ extension JSON {
     default: return nil
         }
     }
+    /// Yields date from string
+    public var asDate:NSDate? {
+        if let dateString = _value as? NSString {
+            let dateFormatter = NSDateFormatter()
+
+            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZ"
+
+            return dateFormatter.dateFromString(dateString)
+        }
+        return nil
+    }
     /// gives the number of elements if an array or a dictionary.
     /// you can use this to check if you can iterate.
     public var length:Int {
