@@ -128,7 +128,7 @@ extension JSON {
     public var isNumber:     Bool {
     if let o = _value as? NSNumber {
         let t = String.fromCString(o.objCType)!
-        return  t == "c" || t == "C"
+        return  t != "c" && t != "C"
     }
     return false
     }
@@ -222,6 +222,17 @@ extension JSON {
         return result
     default: return nil
         }
+    }
+    /// Yields date from string
+    public var asDate:NSDate? {
+        if let dateString = _value as? NSString {
+            let dateFormatter = NSDateFormatter()
+
+            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZ"
+
+            return dateFormatter.dateFromString(dateString)
+        }
+        return nil
     }
     /// gives the number of elements if an array or a dictionary.
     /// you can use this to check if you can iterate.
