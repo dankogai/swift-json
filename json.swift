@@ -45,9 +45,16 @@ extension JSON {
     }
     /// does what JSON.stringify in ES5 does.
     /// when the 2nd argument is set to true it pretty prints
-    public class func stringify(obj:AnyObject, pretty:Bool=false) -> String {
-        //return JSON(obj).toString(pretty:pretty)
-        return JSON(obj).description
+    public class func stringify(obj:AnyObject, pretty:Bool=false) -> String! {
+        if !NSJSONSerialization.isValidJSONObject(obj) {
+            JSON(NSError(
+                domain:"JSONErrorDomain",
+                code:422,
+                userInfo:[NSLocalizedDescriptionKey: "not an JSON object"]
+                ))
+            return nil
+        }
+        return JSON(obj).toString(pretty:pretty)
     }
 }
 /// instance properties
@@ -91,6 +98,10 @@ extension JSON {
                     NSLocalizedDescriptionKey: "not an object"
                 ]))
             }
+    }
+    /// access json data object
+    public var data:AnyObject? {
+        return self.isError ? nil : self._value
     }
     /// Gives the type name as string.
     /// e.g.  if it returns "Double"
