@@ -25,7 +25,7 @@ extension JSON {
         var err:NSError?
         let enc = NSUTF8StringEncoding
         var obj:AnyObject? = NSJSONSerialization.JSONObjectWithData(
-            str.dataUsingEncoding(enc), options:nil, error:&err
+            str.dataUsingEncoding(enc)!, options:nil, error:&err
         )
         return err != nil ? JSON(err!) : JSON(obj!)
     }
@@ -66,7 +66,7 @@ extension JSON {
             return self
         case let ary as NSArray:
             if 0 <= idx && idx < ary.count {
-                return JSON(ary[idx]!)
+                return JSON(ary[idx])
             }
             return JSON(NSError(
                 domain:"JSONErrorDomain", code:404, userInfo:[
@@ -238,9 +238,7 @@ extension JSON {
     public var asDate:NSDate? {
         if let dateString = _value as? NSString {
             let dateFormatter = NSDateFormatter()
-
             dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZ"
-
             return dateFormatter.dateFromString(dateString)
         }
         return nil
@@ -265,11 +263,11 @@ extension JSON : SequenceType {
                 return (i, JSON(o[i]))
             }
         case let o as NSDictionary:
-            var ks = o.allKeys!.reverse()
+            var ks = o.allKeys.reverse()
             return GeneratorOf<(AnyObject, JSON)> {
                 if ks.isEmpty { return nil }
                 let k = ks.removeLast() as String
-                return (k, JSON(o.valueForKey(k)))
+                return (k, JSON(o.valueForKey(k)!))
             }
         default:
             return GeneratorOf<(AnyObject, JSON)>{ nil }
@@ -312,7 +310,7 @@ extension JSON : Printable {
                 _value, options:opts, error:nil
             )
             return NSString(
-                data:data, encoding:NSUTF8StringEncoding
+                data:data!, encoding:NSUTF8StringEncoding
             )
         }
     }
