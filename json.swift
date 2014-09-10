@@ -41,7 +41,7 @@ extension JSON {
     }
     /// fetch the JSON string from URL in the string
     public class func fromURL(url:String) -> JSON {
-        return self.fromNSURL(NSURL.URLWithString(url))
+        return self.fromNSURL(NSURL(string:url))
     }
     /// does what JSON.stringify in ES5 does.
     /// when the 2nd argument is set to true it pretty prints
