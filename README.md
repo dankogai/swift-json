@@ -40,13 +40,15 @@ json.toString()
 ...or string...
 
 ````swift
-let json = JSON.parse("{\"array\":[...}")
+let json = JSON(string:"{\"array\":[...}")
+// let json = JSON.parse("{\"array\":[...}")
 ````
 
 ...or URL.
 
 ````swift
-let json = JSON.fromURL("http://api.dan.co.jp/jsonenv")
+let json = JSON(url:"http://api.dan.co.jp/jsonenv")
+// let json = JSON.fromURL("http://api.dan.co.jp/jsonenv")
 ````
 
 ### Tree Traversal
