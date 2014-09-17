@@ -28,7 +28,8 @@ let obj:[String:AnyObject] = [
 let json = JSON(obj)
 let jstr = json.toString()
 jstr => println
-JSON.parse(jstr).toString() == jstr     => println
+JSON(string:jstr).toString()
+    == JSON.parse(jstr).toString()  => println
 json.toString(pretty: true)             => println
 json["object"]                          => println
 json["object"]["array"]                 => println
@@ -94,6 +95,6 @@ myjson.object.string        => println
 myjson.url                  => println
 ////
 var url = "http://api.dan.co.jp/asin/4534045220.json"
-JSON.fromURL(url).toString(pretty:true)    => println
+JSON(url:url).toString(pretty:true)    => println
 url = "http://api.dan.co.jp/nonexistent"
-JSON.fromURL(url).toString(pretty:true)    => println
+JSON(url:url).toString(pretty:true)    => println

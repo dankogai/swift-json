@@ -20,28 +20,43 @@ extension JSON {
     public typealias NSNull = Foundation.NSNull
     public typealias NSError = Foundation.NSError
     public class var null:NSNull { return NSNull() }
-    /// pases string to the JSON object
-    public class func parse(str:String)->JSON {
+    /// constructs JSON object from string
+    public convenience init(string:String) {
         var err:NSError?
         let enc:NSStringEncoding = NSUTF8StringEncoding
         var obj:AnyObject? = NSJSONSerialization.JSONObjectWithData(
-            str.dataUsingEncoding(enc)!, options:nil, error:&err
+            string.dataUsingEncoding(enc)!, options:nil, error:&err
         )
-        return err != nil ? JSON(err!) : JSON(obj!)
+        self.init(err != nil ? err! : obj!)
     }
-    /// fetch the JSON string from NSURL
-    public class func fromNSURL(nsurl:NSURL) -> JSON {
+    /// parses string to the JSON object
+    /// same as JSON(string:String)
+    public class func parse(string:String)->JSON {
+        return JSON(string:string)
+    }
+    /// constructs JSON object from the content of NSURL
+    public convenience init(nsurl:NSURL) {
         var enc:NSStringEncoding = NSUTF8StringEncoding
         var err:NSError?
         let str:String? =
         NSString(
             contentsOfURL:nsurl, usedEncoding:&enc, error:&err
         )
-        return err != nil ? JSON(err!) : JSON.parse(str!)
+        if err != nil { self.init(err!) }
+        else { self.init(string:str!) }
+    }
+    /// fetch the JSON string from NSURL and parse it
+    /// same as JSON(nsurl:NSURL)
+    public class func fromNSURL(nsurl:NSURL) -> JSON {
+        return JSON(nsurl:nsurl)
+    }
+    /// constructs JSON object from the content of URL
+    public convenience init(url:String) {
+        self.init(nsurl:NSURL(string:url)!)
     }
     /// fetch the JSON string from URL in the string
     public class func fromURL(url:String) -> JSON {
-        return self.fromNSURL(NSURL(string:url)!)
+        return JSON(url:url)
     }
     /// does what JSON.stringify in ES5 does.
     /// when the 2nd argument is set to true it pretty prints
