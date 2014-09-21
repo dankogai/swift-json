@@ -52,7 +52,7 @@ extension JSON {
     }
     /// constructs JSON object from the content of URL
     public convenience init(url:String) {
-        if let nsurl = NSURL(string:url) {
+        if let nsurl = NSURL(string:url) as NSURL? {
             self.init(nsurl:nsurl)
         } else {
             self.init(NSError(
@@ -332,10 +332,10 @@ extension JSON : Printable {
                 ? NSJSONWritingOptions.PrettyPrinted : nil
             if let data = NSJSONSerialization.dataWithJSONObject(
                 _value, options:opts, error:nil
-            ) {
+            ) as NSData? {
                 if let nsstring = NSString(
                     data:data, encoding:NSUTF8StringEncoding
-                ) {
+                ) as NSString? {
                     return nsstring
                 }
             }
