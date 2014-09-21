@@ -52,7 +52,7 @@ extension JSON {
     }
     /// constructs JSON object from the content of URL
     public convenience init(url:String) {
-        self.init(nsurl:NSURL(string:url)!)
+        self.init(nsurl:NSURL(string:url))
     }
     /// fetch the JSON string from URL in the string
     public class func fromURL(url:String) -> JSON {
@@ -326,7 +326,7 @@ extension JSON : Printable {
             )
             return NSString(
                 data:data!, encoding:NSUTF8StringEncoding
-            )!
+            )
         }
     }
     public var description:String { return toString() }
