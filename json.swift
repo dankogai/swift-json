@@ -52,7 +52,16 @@ extension JSON {
     }
     /// constructs JSON object from the content of URL
     public convenience init(url:String) {
-        self.init(nsurl:NSURL(string:url))
+        if let nsurl = NSURL(string:url) {
+            self.init(nsurl:nsurl)
+        } else {
+            self.init(NSError(
+                domain:"JSONErrorDomain",
+                code:400,
+                userInfo:[NSLocalizedDescriptionKey: "malformed URL"]
+                )
+            )
+        }
     }
     /// fetch the JSON string from URL in the string
     public class func fromURL(url:String) -> JSON {
@@ -321,12 +330,16 @@ extension JSON : Printable {
         default:
             let opts = pretty
                 ? NSJSONWritingOptions.PrettyPrinted : nil
-            let data = NSJSONSerialization.dataWithJSONObject(
+            if let data = NSJSONSerialization.dataWithJSONObject(
                 _value, options:opts, error:nil
-            )
-            return NSString(
-                data:data!, encoding:NSUTF8StringEncoding
-            )
+            ) {
+                if let nsstring = NSString(
+                    data:data, encoding:NSUTF8StringEncoding
+                ) {
+                    return nsstring
+                }
+            }
+            return "YOU ARE NOT SUPPOSED TO SEE THIS!"
         }
     }
     public var description:String { return toString() }
