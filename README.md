@@ -6,7 +6,9 @@ Even Swiftier JSON Handler
 Usage
 -----
 
-Just add `json.swift` to your project and have fun!
+Just add [json/json.swift] to your project and have fun!
+
+[json/json.swift]: ./[json/json.swift
 
 Synopsis
 --------
