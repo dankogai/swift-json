@@ -8,7 +8,7 @@ Usage
 
 Just add [json/json.swift] to your project and have fun!
 
-[json/json.swift]: ./[json/json.swift
+[json/json.swift]: ./json/json.swift
 
 Synopsis
 --------
