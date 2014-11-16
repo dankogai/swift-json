@@ -20,14 +20,18 @@ extension JSON {
     public typealias NSNull = Foundation.NSNull
     public typealias NSError = Foundation.NSError
     public class var null:NSNull { return NSNull() }
-    /// constructs JSON object from string
-    public convenience init(string:String) {
+    /// constructs JSON object from data
+    public convenience init(data:NSData) {
         var err:NSError?
-        let enc:NSStringEncoding = NSUTF8StringEncoding
         var obj:AnyObject? = NSJSONSerialization.JSONObjectWithData(
-            string.dataUsingEncoding(enc)!, options:nil, error:&err
+            data, options:nil, error:&err
         )
         self.init(err != nil ? err! : obj!)
+    }
+    /// constructs JSON object from string
+    public convenience init(string:String) {
+        let enc:NSStringEncoding = NSUTF8StringEncoding
+        self.init(data: string.dataUsingEncoding(enc)!)
     }
     /// parses string to the JSON object
     /// same as JSON(string:String)
