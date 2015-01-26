@@ -214,6 +214,32 @@ extension JSON {
     default: return nil
         }
     }
+	/// gives Int32 if self holds it. nil otherwise
+	public var asInt32:Int32? {
+		switch _value {
+		case let o as NSNumber:
+			switch String.fromCString(o.objCType)! {
+			case "c", "C":
+				return nil
+			default:
+				return Int32(o.longLongValue)
+			}
+		default: return nil
+		}
+	}
+	/// gives Int64 if self holds it. nil otherwise
+	public var asInt64:Int64? {
+		switch _value {
+		case let o as NSNumber:
+			switch String.fromCString(o.objCType)! {
+			case "c", "C":
+				return nil
+			default:
+				return Int64(o.longLongValue)
+			}
+		default: return nil
+		}
+	}
     /// gives Double if self holds it. nil otherwise
     public var asDouble:Double? {
     switch _value {
