@@ -98,3 +98,8 @@ var url = "http://api.dan.co.jp/asin/4534045220.json"
 JSON(url:url).toString(pretty:true)    => println
 url = "http://api.dan.co.jp/nonexistent"
 JSON(url:url).toString(pretty:true)    => println
+/// https://github.com/dankogai/swift-json/issues/18
+let ary = JSON(JSON(["json in JSON"]))
+ary.toString()  => println
+let dict = JSON(["json in JSON":JSON(ary)])
+dict.toString() => println

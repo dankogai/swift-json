@@ -14,6 +14,17 @@ public class JSON {
     public init(_ obj:AnyObject) { self._value = obj }
     /// pass the JSON object for another instance
     public init(_ json:JSON){ self._value = json._value }
+    /// Address https://github.com/dankogai/swift-json/issues/18
+    public init(_ ary:[JSON]) {
+        var value = [AnyObject]()
+        for v in ary { value.append(v._value) }
+        self._value = value
+    }
+    public init(_ dict:[String:JSON]) {
+        var value = [String:AnyObject]()
+        for (k,v) in dict { value[k]  = v._value }
+        self._value = value
+    }
 }
 /// class properties
 extension JSON {
