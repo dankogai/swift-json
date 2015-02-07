@@ -9,22 +9,32 @@ import Foundation
 /// init
 public class JSON {
     private let _value:AnyObject
+    /// unwraps the JSON object
+    public class func unwrap(obj:AnyObject) -> AnyObject {
+        switch obj {
+        case let json as JSON:
+            return json._value
+        case let ary as NSArray:
+            var ret = [AnyObject]()
+            for v in ary {
+                ret.append(unwrap(v))
+            }
+            return ret
+        case let dict as NSDictionary:
+            var ret = [String:AnyObject]()
+            for (k,v) in dict {
+                ret[k as String] = unwrap(v)
+            }
+            return ret
+        default:
+            return obj
+        }
+    }
     /// pass the object that was returned from
     /// NSJSONSerialization
-    public init(_ obj:AnyObject) { self._value = obj }
+    public init(_ obj:AnyObject) { self._value = JSON.unwrap(obj) }
     /// pass the JSON object for another instance
     public init(_ json:JSON){ self._value = json._value }
-    /// Address https://github.com/dankogai/swift-json/issues/18
-    public init(_ ary:[JSON]) {
-        var value = [AnyObject]()
-        for v in ary { value.append(v._value) }
-        self._value = value
-    }
-    public init(_ dict:[String:JSON]) {
-        var value = [String:AnyObject]()
-        for (k,v) in dict { value[k]  = v._value }
-        self._value = value
-    }
 }
 /// class properties
 extension JSON {
