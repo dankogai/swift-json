@@ -22,8 +22,10 @@ public class JSON {
             return ret
         case let dict as NSDictionary:
             var ret = [String:AnyObject]()
-            for (k,v) in dict {
-                ret[k as String] = unwrap(v)
+            for (ko, v) in dict {
+                if let k = ko as? String {
+                    ret[k] = unwrap(v)
+                }
             }
             return ret
         default:
