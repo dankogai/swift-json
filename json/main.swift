@@ -5,6 +5,7 @@
 // Created by Dan Kogai on 7/15/14.
 // Copyright (c) 2014 Dan Kogai. All rights reserved.
 //
+import Foundation
 //for convenience
 infix operator => { associativity left precedence 95 }
 func => <A,R> (lhs:A, rhs:A->R)->R {
@@ -17,6 +18,7 @@ let obj:[String:AnyObject] = [
         "null":   JSON.null,
         "bool":   true,
         "int":    42,
+        "int64":  NSNumber(longLong: 2305843009213693951), // for 32-bit environment
         "double": 3.141592653589793,
         "string": "a α\t弾\nð",
         "array":  [],
@@ -43,8 +45,14 @@ object["bool"].isBool       => println
 object["bool"].asBool       => println
 object["int"].isInt         => println
 object["int"].asInt         => println
+object["int"].asInt32       => println
+object["int64"].isInt       => println
+object["int64"].asInt       => println // clashes in 32-bit environment
+//object["int64"].asInt32     => println // clashes
+object["int64"].asInt64     => println
 object["double"].isDouble   => println
 object["double"].asDouble   => println
+object["double"].asFloat    => println
 object["string"].asString   => println
 json["array"].isArray       => println
 json["array"].asArray       => println
