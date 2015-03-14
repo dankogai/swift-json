@@ -109,3 +109,6 @@ JSON(url:url).toString(pretty:true)    => println
 /// https://github.com/dankogai/swift-json/issues/18
 let jinj = JSON(JSON(["json in JSON", JSON(["json in JSON":JSON(true)])]))
 jinj.toString()  => println
+//Print Values and Keys.
+json.allValues => println
+json.allKeys => println
