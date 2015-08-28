@@ -11,9 +11,6 @@ infix operator => { associativity left precedence 95 }
 func => <A,R> (lhs:A, rhs:A->R)->R {
     return rhs(lhs)
 }
-func printOut(a: Any) {
-    print(a)
-}
 //let the show begin!
 let obj:[String:AnyObject] = [
     "array": [JSON.null, false, 0, "", [], [:]],
@@ -32,53 +29,53 @@ let obj:[String:AnyObject] = [
 //
 let json = JSON(obj)
 let jstr = json.toString()
-jstr => printOut
+jstr => println
 JSON(string:jstr).toString()
-    == JSON.parse(jstr).toString()  => printOut
-json.toString(true)             => printOut
-json["object"]                          => printOut
-json["object"]["array"]                 => printOut
-json["object"]["array"][0]              => printOut
-json["object"]["object"][""]            => printOut
-json["array"]                           => printOut
+    == JSON.parse(jstr).toString()  => println
+json.toString(pretty: true)             => println
+json["object"]                          => println
+json["object"]["array"]                 => println
+json["object"]["array"][0]              => println
+json["object"]["object"][""]            => println
+json["array"]                           => println
 let object = json["object"]
-object["null"].isNull       => printOut
-object["null"].asNull       => printOut
-object["bool"].isBool       => printOut
-object["bool"].asBool       => printOut
-object["int"].isInt         => printOut
-object["int"].asInt         => printOut
-object["int"].asInt32       => printOut
-object["int64"].isInt       => printOut
-object["int64"].asInt       => printOut // clashes in 32-bit environment
-//object["int64"].asInt32     => printOutln // clashes
-object["int64"].asInt64     => printOut
-object["double"].isDouble   => printOut
-object["double"].asDouble   => printOut
-object["double"].asFloat    => printOut
-object["string"].asString   => printOut
-json["array"].isArray       => printOut
-json["array"].asArray       => printOut
-json["array"].length        => printOut
-json["object"].isDictionary => printOut
-json["object"].asDictionary => printOut
-json["object"].length       => printOut
+object["null"].isNull       => println
+object["null"].asNull       => println
+object["bool"].isBool       => println
+object["bool"].asBool       => println
+object["int"].isInt         => println
+object["int"].asInt         => println
+object["int"].asInt32       => println
+object["int64"].isInt       => println
+object["int64"].asInt       => println // clashes in 32-bit environment
+//object["int64"].asInt32     => println // clashes
+object["int64"].asInt64     => println
+object["double"].isDouble   => println
+object["double"].asDouble   => println
+object["double"].asFloat    => println
+object["string"].asString   => println
+json["array"].isArray       => println
+json["array"].asArray       => println
+json["array"].length        => println
+json["object"].isDictionary => println
+json["object"].asDictionary => println
+json["object"].length       => println
 for (k, v) in json["array"] {
-    "[\"array\"][\(k)] =>\t\(v)"        => printOut
+    "[\"array\"][\(k)] =>\t\(v)"        => println
 }
 for (k, v) in json["object"] {
-    "[\"object\"][\"\(k)\"] =>\t\(v)"   => printOut
+    "[\"object\"][\"\(k)\"] =>\t\(v)"   => println
 }
 for (k, v) in json["url"] {
-    "!!!! not supposed to see this!"    => printOut
+    "!!!! not supposed to see this!"    => println
 }
-json["wrong_key"][Int.max]["wrong_name"]    => printOut
+json["wrong_key"][Int.max]["wrong_name"]    => println
 /// error handling
 if let b = json["noexistent"][1234567890]["entry"].asBool {
-    printOut(b);
+    println(b);
 } else {
     let e = json["noexistent"][1234567890]["entry"].asError
-    printOut(e)
+    println(e)
 }
 ////  schema by subclassing
 class MyJSON : JSON {
@@ -94,24 +91,24 @@ class MyJSON : JSON {
     var object:MyJSON  { return MyJSON(self["object"]) }
 }
 let myjson = MyJSON(obj)
-myjson.toString() == jstr   => printOut
-myjson.object               => printOut
-myjson.object.array         => printOut
-myjson.array                => printOut
-myjson.object.null          => printOut
-myjson.object.bool          => printOut
-myjson.object.int           => printOut
-myjson.object.double        => printOut
-myjson.object.string        => printOut
-myjson.url                  => printOut
+myjson.toString() == jstr   => println
+myjson.object               => println
+myjson.object.array         => println
+myjson.array                => println
+myjson.object.null          => println
+myjson.object.bool          => println
+myjson.object.int           => println
+myjson.object.double        => println
+myjson.object.string        => println
+myjson.url                  => println
 ////
 var url = "http://api.dan.co.jp/asin/4534045220.json"
-JSON(url:url).toString(true)    => printOut
+JSON(url:url).toString(pretty:true)    => println
 url = "http://api.dan.co.jp/nonexistent"
-JSON(url:url).toString(true)    => printOut
+JSON(url:url).toString(pretty:true)    => println
 /// https://github.com/dankogai/swift-json/issues/18
 let jinj = JSON(JSON(["json in JSON", JSON(["json in JSON":JSON(true)])]))
-jinj.toString()  => printOut
-// Print Values and Keys.
-json.allValues => printOut
-json.allKeys => printOut
+jinj.toString()  => println
+//Print Values and Keys.
+json.allValues => println
+json.allKeys => println
