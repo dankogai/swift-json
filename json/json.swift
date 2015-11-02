@@ -357,10 +357,10 @@ extension JSON {
     }
     // gives all keys content in JSON object.
     public var allKeys:JSON{
-        if(self._value.allKeys == nil) {
+        if(self._value.allObjects == nil) {
             return JSON([])
         }
-        return JSON(self._value.allKeys)
+        return JSON(self._value.allObjects)
     }
 }
 extension JSON : SequenceType {
