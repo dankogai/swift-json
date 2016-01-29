@@ -455,5 +455,5 @@ public func ==(lhs:JSON, rhs:JSON)->Bool {
         }
         return true
     }
-    fatalError("== failed!")
+    fatalError("JSON == JSON failed!")
 }

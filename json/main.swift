@@ -26,8 +26,18 @@ let obj:[String:AnyObject] = [
 let json = JSON(obj)
 let jstr = json.toString()
 test.eq(JSON(string:jstr), JSON.parse(jstr), "JSON(string:jstr)==JSON.parse(jstr)")
-test.eq(JSON(string:jstr).toString(),JSON.parse(jstr).toString(), "JSON(string:jstr).toString()==JSON.parse(jstr).toString()")
-
+test.eq(json["object"], JSON.parse(jstr)["object"],                     "== object")
+test.eq(json["object"]["null"], JSON.parse(jstr)["object"]["null"],     "== null")
+test.eq(json["object"]["bool"], JSON.parse(jstr)["object"]["bool"],     "== bool")
+test.eq(json["object"]["int"], JSON.parse(jstr)["object"]["int"],       "== int")
+test.eq(json["object"]["int64"], JSON.parse(jstr)["object"]["int64"],   "== int64")
+test.eq(json["object"]["double"], JSON.parse(jstr)["object"]["double"], "== double")
+test.eq(json["object"]["string"], JSON.parse(jstr)["object"]["string"], "== string")
+test.eq(json["array"], JSON.parse(jstr)["array"],                       "== array")
+test.eq(json["object"]["array"], JSON.parse(jstr)["object"]["array"],   "== []")
+test.eq(json["object"]["object"], JSON.parse(jstr)["object"]["object"], "== {}")
+test.ne(json["nosuchkey"], JSON.parse(jstr)["nosuchkey"],               "error == error is always false")
+test.eq(JSON(string:jstr).toString(),JSON.parse(jstr).toString(),       "== .toString()")
 class MyJSON : JSON {
     override init(_ obj:AnyObject){ super.init(obj) }
     override init(_ json:JSON)  { super.init(json) }
@@ -40,88 +50,13 @@ class MyJSON : JSON {
     var array :MyJSON  { return MyJSON(self["array"])  }
     var object:MyJSON  { return MyJSON(self["object"]) }
 }
-let myjson = MyJSON(obj)
-test.eq(myjson.toString(),jstr, "myjson == json")
-
-/*
-json["object"]                          => cout
-json["object"]["array"]                 => cout
-json["object"]["array"][0]              => cout
-json["object"]["object"][""]            => cout
-json["array"]                           => cout
-let object = json["object"]
-object["null"].isNull       => cout
-object["null"].asNull       => cout
-object["bool"].isBool       => cout
-object["bool"].asBool       => cout
-object["int"].isInt         => cout
-object["int"].asInt         => cout
-object["int"].asInt32       => cout
-object["int64"].isInt       => cout
-//object["int64"].asInt       => cout // should crash in 32-bit environment
-//object["int64"].asInt32     => cout // should crash in 64-bit environment
-object["int64"].asInt64     => cout
-object["double"].isDouble   => cout
-object["double"].asDouble   => cout
-object["double"].asFloat    => cout
-object["string"].asString   => cout
-json["array"].isArray       => cout
-json["array"].asArray       => cout
-json["array"].length        => cout
-json["object"].isDictionary => cout
-json["object"].asDictionary => cout
-json["object"].length       => cout
-for (k, v) in json["array"] {
-    "[\"array\"][\(k)] =>\t\(v)"        => cout
-}
-for (k, v) in json["object"] {
-    "[\"object\"][\"\(k)\"] =>\t\(v)"   => cout
-}
-for (k, v) in json["url"] {
-    "!!!! not supposed to see this!"    => cout
-}
-json["wrong_key"][Int.max]["wrong_name"]    => cout
-/// error handling
-if let b = json["noexistent"][1234567890]["entry"].asBool {
-    cout(b);
-} else {
-    let e = json["noexistent"][1234567890]["entry"].asError
-    cout(e)
-}
-////  schema by subclassing
-class MyJSON : JSON {
-    override init(_ obj:AnyObject){ super.init(obj) }
-    override init(_ json:JSON)  { super.init(json) }
-    var null  :NSNull? { return self["null"].asNull }
-    var bool  :Bool?   { return self["bool"].asBool }
-    var int   :Int?    { return self["int"].asInt }
-    var double:Double? { return self["double"].asDouble }
-    var string:String? { return self["string"].asString }
-    var url:   String? { return self["url"].asString }
-    var array :MyJSON  { return MyJSON(self["array"])  }
-    var object:MyJSON  { return MyJSON(self["object"]) }
-}
-let myjson = MyJSON(obj)
-myjson.toString() == jstr   => cout
-myjson.object               => cout
-myjson.object.array         => cout
-myjson.array                => cout
-myjson.object.null          => cout
-myjson.object.bool          => cout
-myjson.object.int           => cout
-myjson.object.double        => cout
-myjson.object.string        => cout
-myjson.url                  => cout
-////
-var url = "http://api.dan.co.jp/asin/4534045220.json"
-JSON(url:url).toString(true)    => cout
-url = "http://api.dan.co.jp/nonexistent"
-JSON(url:url).toString(true)    => cout
-/// https://github.com/dankogai/swift-json/issues/18
-let jinj = JSON(JSON(["json in JSON", JSON(["json in JSON":JSON(true)])]))
-jinj.toString()  => cout
-// Print Values and Keys.
-json.allValues => cout
-json.allKeys => cout
-*/
+let myjson = MyJSON(string:jstr)
+test.eq(myjson, json, "myjson == json")
+test.eq(myjson.null,    json["null"].asNull,        "myjson.null == json[\"null\"]")
+test.eq(myjson.bool,    json["bool"].asBool,        "myjson.bool == json[\"bool\"]")
+test.eq(myjson.int,     json["int"].asInt,          "myjson.int == json[\"int\"]")
+test.eq(myjson.double,  json["double"].asDouble,    "myjson.double == json[\"double\"]")
+test.eq(myjson.string,  json["string"].asString,    "myjson.string == json[\"string\"]")
+test.eq(myjson.array,   json["array"],              "myjson.array == json[\"array\"]")
+test.eq(myjson.object,  json["object"],             "myjson.object == json[\"object\"]")
 test.done()
