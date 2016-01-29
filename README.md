@@ -1,23 +1,27 @@
-swift-json
-==========
+[![build status](https://secure.travis-ci.org/dankogai/swift-json.png)](http://travis-ci.org/dankogai/swift-json)
+
+
+# swift-json
 
 Even Swiftier JSON Handler
 
-Prerequisite
-------------
+## Usage
 
-Swift 2.0 or better.  For Swift 1.x and below check the swift-1.x branch (which is no longer maintained)
+### Playground
 
+Just open one of the playrounds and have fun!
 
-Usage
------
+### In your project
 
-Just add [json/json.swift] to your project and have fun!
+Just add [json/json.swift] to your project.
 
 [json/json.swift]: ./json/json.swift
 
-Synopsis
---------
+### in REPL
+
+`make repl` and `import JSON`.
+
+## Synopsis
 
 Turn your swift object to JSON like so:
 
@@ -183,9 +187,16 @@ myjson.url              // String?
 This approach comes with bonus.  You can't accidentaly access elements that was not supposed to there.  JSON is schemaless and that is what makes JSON rule today.  But that is also what makes JSON so prone to error.   With Swift and this `JSON` class you get the best of both worlds -- flexibility of JSON and robustness of static typing.
 
 
-Description
-===========
+## Description
 
 See [wiki/Discussion].
 
 [wiki/Discussion]: https://github.com/dankogai/swift-json/wiki/Discussion
+
+## Prerequisite
+
+Swift 2.0 or better.  OSX or iOS or tvOS.  Linux is currently not supported since it lacks most of `Foundation` objects including `NSJSONSerialization`.
+
+For Swift 1.x and below check the swift-1.x branch (which is no longer maintained)
+
+
