@@ -61,9 +61,9 @@
 		9E66B57419F5E3F30016A7C1 /* json */ = {
 			isa = PBXGroup;
 			children = (
-				9E5CC2DA1C5B1F2700A19CE8 /* tap.swift */,
-				9E66B57519F5E3F30016A7C1 /* main.swift */,
 				9E66B57C19F5E46F0016A7C1 /* json.swift */,
+				9E66B57519F5E3F30016A7C1 /* main.swift */,
+				9E5CC2DA1C5B1F2700A19CE8 /* tap.swift */,
 			);
 			path = json;
 			sourceTree = "<group>";

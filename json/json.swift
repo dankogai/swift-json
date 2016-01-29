@@ -341,13 +341,14 @@ extension JSON {
     }
     /// gives the number of elements if an array or a dictionary.
     /// you can use this to check if you can iterate.
-    public var length:Int {
+    public var count:Int {
         switch _value {
         case let o as NSArray:      return o.count
         case let o as NSDictionary: return o.count
         default: return 0
         }
     }
+    public var length:Int { return self.count }
     // gives all values content in JSON object.
     public var allValues:JSON{
         if(self._value.allValues == nil) {
@@ -357,10 +358,10 @@ extension JSON {
     }
     // gives all keys content in JSON object.
     public var allKeys:JSON{
-        if(self._value.allObjects == nil) {
+        if(self._value.allKeys == nil) {
             return JSON([])
         }
-        return JSON(self._value.allObjects)
+        return JSON(self._value.allKeys)
     }
 }
 extension JSON : SequenceType {
@@ -430,4 +431,29 @@ extension JSON : CustomStringConvertible {
         }
     }
     public var description:String { return toString() }
+}
+
+extension JSON : Equatable {}
+public func ==(lhs:JSON, rhs:JSON)->Bool {
+    // print("lhs:\(lhs), rhs:\(rhs)")
+    if lhs.isError || rhs.isError { return false }
+    else if lhs.isLeaf {
+        if lhs.isNull   { return lhs.asNull   == rhs.asNull }
+        if lhs.isBool   { return lhs.asBool   == rhs.asBool }
+        if lhs.isNumber { return lhs.asNumber == rhs.asNumber }
+        if lhs.isString { return lhs.asString == rhs.asString }
+    }
+    else if lhs.isArray {
+        for i in 0..<lhs.count {
+            if lhs[i] != rhs[i] { return false }
+        }
+        return true
+    }
+    else if lhs.isDictionary {
+        for (k, v) in lhs.asDictionary! {
+            if v != rhs[k] { return false }
+        }
+        return true
+    }
+    fatalError("== failed!")
 }

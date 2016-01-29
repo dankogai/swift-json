@@ -6,16 +6,7 @@
 // Copyright (c) 2014 Dan Kogai. All rights reserved.
 //
 import Foundation
-//for convenience
-infix operator => { associativity left precedence 95 }
-func => <A,R> (lhs:A, rhs:A->R)->R {
-    return rhs(lhs)
-}
-var counter = 0;
-func cout(a: Any) {
-    print("\(counter):\t\(a)")
-    counter++
-}
+let test = TAP()
 //let the show begin!
 let obj:[String:AnyObject] = [
     "array": [JSON.null, false, 0, "", [], [:]],
@@ -34,10 +25,25 @@ let obj:[String:AnyObject] = [
 //
 let json = JSON(obj)
 let jstr = json.toString()
-jstr => cout
-JSON(string:jstr).toString()
-    == JSON.parse(jstr).toString()  => cout
-json.toString(true)             => cout
+test.eq(JSON(string:jstr), JSON.parse(jstr), "JSON(string:jstr)==JSON.parse(jstr)")
+test.eq(JSON(string:jstr).toString(),JSON.parse(jstr).toString(), "JSON(string:jstr).toString()==JSON.parse(jstr).toString()")
+
+class MyJSON : JSON {
+    override init(_ obj:AnyObject){ super.init(obj) }
+    override init(_ json:JSON)  { super.init(json) }
+    var null  :NSNull? { return self["null"].asNull }
+    var bool  :Bool?   { return self["bool"].asBool }
+    var int   :Int?    { return self["int"].asInt }
+    var double:Double? { return self["double"].asDouble }
+    var string:String? { return self["string"].asString }
+    var url:   String? { return self["url"].asString }
+    var array :MyJSON  { return MyJSON(self["array"])  }
+    var object:MyJSON  { return MyJSON(self["object"]) }
+}
+let myjson = MyJSON(obj)
+test.eq(myjson.toString(),jstr, "myjson == json")
+
+/*
 json["object"]                          => cout
 json["object"]["array"]                 => cout
 json["object"]["array"][0]              => cout
@@ -117,3 +123,5 @@ jinj.toString()  => cout
 // Print Values and Keys.
 json.allValues => cout
 json.allKeys => cout
+*/
+test.done()
