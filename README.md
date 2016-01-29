@@ -184,7 +184,7 @@ myjson.object.string    // String?
 myjson.url              // String?
 ````
 
-This approach comes with bonus.  You can't accidentaly access elements that was not supposed to there.  JSON is schemaless and that is what makes JSON rule today.  But that is also what makes JSON so prone to error.   With Swift and this `JSON` class you get the best of both worlds -- flexibility of JSON and robustness of static typing.
+This approach comes with bonus.  You can't accidentaly access elements that was not supposed to be there.  JSON is schemaless and that is what makes JSON rule today.  But that is also what makes JSON so prone to errors.   With Swift and this `JSON` class you get the best of both worlds -- flexibility of JSON and robustness of static typing.
 
 
 ## Description
