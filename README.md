@@ -7,6 +7,10 @@ Even Swiftier JSON Handler
 
 ## Usage
 
+### Workspace
+
+View all the playgrounds and the project via `JSON.xcworkspace`!
+
 ### Playground
 
 Just open one of the playrounds and have fun!
