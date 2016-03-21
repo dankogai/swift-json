@@ -199,7 +199,7 @@ See [wiki/Discussion].
 
 ## Prerequisite
 
-Swift 2.0 or better.  OSX or iOS or tvOS.  Linux is currently not supported since it lacks most of `Foundation` objects including `NSJSONSerialization`.
+Swift 2.2 or better.  OSX or iOS or tvOS.  Linux is currently not supported since it lacks most of `Foundation` objects including `NSJSONSerialization`.
 
 For Swift 1.x and below check the swift-1.x branch (which is no longer maintained)
 
