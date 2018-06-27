@@ -248,7 +248,7 @@ and the following to the `.target` argument:
 Now all you have to do is:
 
 ```swift
-import Complex
+import JSON
 ```
 
 in your code.  Enjoy!
