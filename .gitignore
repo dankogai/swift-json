@@ -42,6 +42,8 @@ Package.resolved
 .attic/
 # .xcodeproj is ignored. use `swift package generate-xcodeproj`
 *.xcodeproj
+# ignore this directory for scripts/ios-prep.sh
+iOS/JSON.playground/Sources
 
 # CocoaPods
 #
