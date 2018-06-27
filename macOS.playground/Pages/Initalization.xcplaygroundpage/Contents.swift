@@ -1,7 +1,8 @@
 //: [Previous](@previous)
-
-// import JSON // you don't need this on playground
-
+import JSON
+//: ### Initialization
+//:
+//: You can build JSON directly as a literal…
 let json:JSON = [
     "null":     nil,
     "bool":     true,
@@ -15,6 +16,7 @@ let json:JSON = [
     "url":"https://github.com/dankogai/"
 ]
 
+//: …or String…
 let str = """
 {
     "null":     null,
@@ -30,18 +32,16 @@ let str = """
 
 }
 """
+JSON(string:str)!   // failable
 
-JSON(string:str) == json
+//: …or a content of the URL…
+JSON(urlString:"https://api.github.com")
 
-json["null"]
-json["bool"]
-json["int"]
-json["double"]
-json["string"]
-json["array"]
-json["array"][4]
-json["object"]["object"]
-json["url"]
-json["nonexistent"]
+//: …or by decoding Codable data…
+import Foundation
+struct Point:Hashable, Codable { let (x, y):(Int, Int) }
+var data = try JSONEncoder().encode(Point(x:3, y:4))
+String(data:data, encoding:.utf8)
+try JSONDecoder().decode(JSON.self, from:data)
 
 //: [Next](@next)

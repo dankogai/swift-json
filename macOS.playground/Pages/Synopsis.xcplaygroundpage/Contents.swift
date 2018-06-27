@@ -17,17 +17,16 @@ let json:JSON = [
 
 let str = json.description
 
-//JSON(urlString:"https://api.github.com")
-//
-//for (k, v) in json["object"] {
-//    print(k.key!, v)
-//}
-//for (k, v) in json["array"] {
-//    print(k.index!, v)
-//}
-//for (k, v) in json["bool"] {
-//    print(v)
-//}
+JSON(urlString:"https://api.github.com")
+
+for (k, v) in json["object"] {
+    print(k.key!, v)
+}
+for (k, v) in json["array"] {
+    print(k.index!, v)
+}
+for (k, v) in json["bool"] {
+    print(v)
+}
 
 //: [Next](@next)
-JSON(any:nil)

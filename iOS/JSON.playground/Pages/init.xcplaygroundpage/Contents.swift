@@ -1,7 +1,8 @@
 //: [Previous](@previous)
-
-// import JSON // you don't need this on playground
-
+//: ## Initialization
+//:
+//: You 
+//:
 let json:JSON = [
     "null":     nil,
     "bool":     true,
@@ -30,18 +31,5 @@ let str = """
 
 }
 """
-
-JSON(string:str) == json
-
-json["null"]
-json["bool"]
-json["int"]
-json["double"]
-json["string"]
-json["array"]
-json["array"][4]
-json["object"]["object"]
-json["url"]
-json["nonexistent"]
 
 //: [Next](@next)
