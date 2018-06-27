@@ -283,7 +283,7 @@ extension JSON : Codable {
                 }
             }
         }
-        self = JSON(any:nil)!
+        self = JSON.Null
     }
     public func encode(to encoder: Encoder) throws {
         var c = encoder.singleValueContainer()
