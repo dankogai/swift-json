@@ -267,12 +267,13 @@ extension JSON : Sequence {
 }
 extension JSON : Codable {
     private static let codableTypes:[Codable.Type] = [
-        Swift.Bool.self,
-        Int.self,   Int8.self,  Int16.self,  Int32.self,  Int64.self,
-        UInt.self,  UInt8.self, UInt16.self, UInt32.self, UInt64.self,
-        Float.self, Double.self,
+        [Key:Value].self, [Value].self,
         Swift.String.self,
-        [Value].self, [Key:Value].self
+        Swift.Bool.self,
+        UInt.self, Int.self,
+        Double.self, Float.self,
+        UInt64.self, UInt32.self, UInt16.self, UInt8.self,
+        Int64.self,  Int32.self,  Int16.self,  Int8.self,
     ]
     public init(from decoder: Decoder) throws {
         if let c = try? decoder.singleValueContainer(), !c.decodeNil() {
