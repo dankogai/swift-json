@@ -15,6 +15,14 @@ let json:JSON = ["swift":["safe","fast","expressive"]]
 
 ## Description
 
+This module is a lot like [SwiftyJSON] in functionality.  It wraps [JSONSerialization] nicely and intuitively.  But it differs in how to do so.
+
+[SwiftyJSON]: https://github.com/SwiftyJSON/SwiftyJSON
+[JSONSerialization]: https://developer.apple.com/documentation/foundation/jsonserialization
+
+* SwiftyJSON's `JSON` is `struct`.  `JSON` of this module is `enum`
+* SwiftyJSON keeps the output of `JSONSerialization.jsonObject` in its stored property and convert its value runtime.  `JSON` of this module is static.  Definitely Swiftier.
+* SwiftyJSON's `JSON.swift` is over 1,500 lines while that of this module is less than 350 (as of this writing).  Since it is so compact you can use it without building framework.
 
 ### Initialization
 
@@ -53,7 +61,7 @@ let str = """
 
 }
 """
-JSON(string:str)!   // failable
+JSON(string:str)
 ```
 
 …or a content of the URL…
@@ -68,7 +76,6 @@ JSON(urlString:"https://api.github.com")
 import Foundation
 struct Point:Hashable, Codable { let (x, y):(Int, Int) }
 var data = try JSONEncoder().encode(Point(x:3, y:4))
-String(data:data, encoding:.utf8)
 try JSONDecoder().decode(JSON.self, from:data)
 ```
 
@@ -148,6 +155,76 @@ json["number"]  = 0
 json["string"]  = ""
 json["array"]   = []
 json["object"]  = {}
+```
+
+### Protocol Conformance
+
+
+* `JSON` is `Equatable` so you can check if two JSONs are the same.
+
+```swift
+JSON(string:foo) == JSON(urlString:"https://example.com/whereever")
+```
+
+* `JSON` is `Hashable` so you can use it as a dictionary key.
+
+* `JSON` is `ExpressibleBy*Literal`.  That's why you can initialize w/ `variable:JSON` construct show above.
+
+* `JSON` is `CustomStringConvertible` whose `.description` is always a valid JSON.
+
+* `JSON` is `Codable`.  You can use this module instead of `JSONEncoder`.
+
+* `JSON` is `Sequence`.  But when you iterate, be careful with the key.
+
+```swift
+// wrong!
+for v in JSON([nil, true, 1, "one", [1], ["one":1]]) {
+	//
+}
+```
+
+```swift
+// right!
+for (i, v) in JSON([nil, true, 1, "one", [1], ["one":1]]) {
+	// i is NOT an Integer but KeyType.Index.
+	// To access its value, say i.index
+}
+for (k, v) in JSON([
+        "null":nil, "bool":false, "number":0, "string":"" ,
+        "array":[], "object":[:]
+    ]) {
+	// k is NOT an Integer but KeyType.Key.
+	// To access its value, say i.key
+}
+
+```
+
+That is because swift demands to return same `Element` type.  If you feel this counterintuitive, you can simply use `.array` or `.object`:
+
+```swift
+for v in JSON([nil, true, 1, "one", [1], ["one":1]]).array! {
+	// ...
+}
+for (k, v) in JSON([
+        "null":nil, "bool":false, "number":0, "string":"" ,
+        "array":[], "object":[:]
+    ]).object! {
+	// ...
+}
+
+```
+
+### Error handling
+
+Once `init`ed, `JSON` never fails.  That is, it never becomes `nil`.  Instead of being failable or throwing exceptions, `JSON` has a special value `.Error(.ErrorType)` which propagates across the method invocations.  The following code examines the error should it happen.
+
+```swift
+if let e = json.error {
+	debugPrint(e.type)
+	if let nsError = e.nsError {
+		// do anything with nsError
+	}
+}
 ```
 
 ## Usage

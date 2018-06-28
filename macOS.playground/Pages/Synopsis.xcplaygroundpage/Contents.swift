@@ -17,7 +17,9 @@ let json:JSON = [
 
 let str = json.description
 
-JSON(urlString:"https://api.github.com")
+JSON(urlString:"http://api.github.com")
+JSON(string:"true")
+json["foo"]
 
 for (k, v) in json["object"] {
     print(k.key!, v)
@@ -28,5 +30,6 @@ for (k, v) in json["array"] {
 for (k, v) in json["bool"] {
     print(v)
 }
+JSON(["distance":42.195]) == JSON(string: "{\"distance\":42.195}")
 
 //: [Next](@next)

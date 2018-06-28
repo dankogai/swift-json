@@ -16,9 +16,9 @@ public enum JSON:Equatable {
         case keyNonexistent(JSON.Key)
         case nsError(NSError)
     }
-    public typealias Key        = String
-    public typealias Value      = JSON
-    public typealias Index      = Int
+    public typealias Key    = String
+    public typealias Value  = JSON
+    public typealias Index  = Int
     case Error(JSONError)
     case Null
     case Bool(Bool)
@@ -192,6 +192,8 @@ extension JSON {
     public subscript(_ idx:Index)->JSON {
         get {
             switch self {
+            case .Error(_):
+                return self
             case .Array(let a):
                 guard idx < a.count else { return .Error(.indexOutOfRange(idx)) }
                 return a[idx]
@@ -219,6 +221,8 @@ extension JSON {
     public subscript(_ key:Key)->JSON {
         get {
             switch self {
+            case .Error(_):
+                return self
             case .Object(let o):
                 return o[key] ?? .Error(.keyNonexistent(key))
             default:
@@ -314,6 +318,30 @@ extension JSON : Codable {
         case .Object(let v):    try c.encode(v)
         default:
             break
+        }
+    }
+}
+extension JSON.JSONError : CustomStringConvertible {
+    public enum ErrorType {
+        case notAJSONObject, typeMismatch, indexOutOfRange, keyNonexistent, nsError
+    }
+    public var type:ErrorType {
+        switch self {
+        case .notAJSONObject:       return .notAJSONObject
+        case .typeMismatch(_):      return .typeMismatch
+        case .indexOutOfRange(_):   return .indexOutOfRange
+        case .keyNonexistent(_):    return .keyNonexistent
+        case .nsError(_):           return .nsError
+        }
+    }
+    public var nsError:NSError? { switch self { case .nsError(let v) : return v default : return nil } }
+    public var description:String {
+        switch self {
+        case .notAJSONObject:           return "not an jsonObject"
+        case .typeMismatch(let t):      return "\(t) is not an array"
+        case .indexOutOfRange(let i):   return "index \(i) is out of range"
+        case .keyNonexistent(let k):    return "key \"\(k)\" does not exist"
+        case .nsError(let e):           return "\(e)"
         }
     }
 }

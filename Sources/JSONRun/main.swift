@@ -16,10 +16,12 @@ let json0:JSON = [
 ]
 
 print(json0)
-let data = try JSONEncoder().encode(json0)
+var data = try JSONEncoder().encode(json0)
 let json1 = try JSONDecoder().decode(JSON.self, from:data)
 print(json1)
 print(json0 == json1)
 
 struct Point:Hashable, Codable { let (x, y):(Int, Int) }
 
+data = try JSONEncoder().encode(Point(x:3, y:4))
+print( try JSONDecoder().decode(JSON.self, from:data) )
