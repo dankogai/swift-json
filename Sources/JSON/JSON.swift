@@ -9,11 +9,17 @@
 import Foundation
 
 public enum JSON:Equatable {
+    public enum JSONError : Equatable {
+        case notAJSONObject
+        case typeMismatch(JSON.ContentType)
+        case indexOutOfRange(JSON.Index)
+        case keyNonexistent(JSON.Key)
+        case nsError(NSError)
+    }
     public typealias Key        = String
     public typealias Value      = JSON
     public typealias Index      = Int
-    public typealias ErrorType  = String
-    case Error(ErrorType)
+    case Error(JSONError)
     case Null
     case Bool(Bool)
     case Number(Double)
@@ -24,7 +30,7 @@ public enum JSON:Equatable {
 extension JSON : Hashable {
     public var hashValue: Int {
         switch self {
-        case .Error(let m):     fatalError(m)
+        case .Error(let m):     fatalError("\(m)")
         case .Null:             return NSNull().hashValue
         case .Bool(let v):      return v.hashValue
         case .Number(let v):    return v.hashValue
@@ -83,8 +89,8 @@ extension JSON :
     }
 }
 extension JSON {
-    public init?(any:Any?) {
-        switch any {
+    public init(jsonObject:Any?) {
+        switch jsonObject {
         // Be careful! JSONSerialization renders bool as NSNumber use .objcType to tell the difference
         case let a as NSNumber:
             switch Swift.String(cString:a.objCType) {
@@ -93,32 +99,40 @@ extension JSON {
             }
         case nil:               self = .Null
         case let a as String:   self = .String(a)
-        case let a as [Any?]:   self = .Array(a.map{ JSON(any:$0) ?? JSON.Null })
+        case let a as [Any?]:   self = .Array(a.map{ JSON(jsonObject:$0) })
         case let a as [Key:Any?]:
             var o = [Key:Value]()
-            a.forEach{ o[$0.0] = JSON(any:$0.1) ?? JSON.Null }
+            a.forEach{ o[$0.0] = JSON(jsonObject:$0.1) }
             self = .Object(o)
         default:
-            return nil
+            self = .Error(.notAJSONObject)
         }
     }
-    public init?(data:Data) {
-        guard let any = try? JSONSerialization.jsonObject(with:data) else { return nil }
-        self.init(any:any)
+    public init(data:Data) {
+        do {
+            let jo = try JSONSerialization.jsonObject(with:data, options:[.allowFragments])
+            self.init(jsonObject:jo)
+        } catch {
+            self = .Error(.nsError(error as NSError))
+        }
     }
-    public init?(string:String) {
-        guard let data = string.data(using:.utf8) else { return nil }
-        self.init(data:data)
+    public init(string:String) {
+        self.init(data:string.data(using:.utf8)!)
     }
-    public init?(urlString:String) {
-        guard let url = URL(string: urlString) else { return nil }
-        guard let json = JSON(url:url) else { return nil }
-        self = json
+    public init(urlString:String) {
+        if let url = URL(string: urlString) {
+            self = JSON(url:url)
+        } else {
+            self = JSON.Null
+        }
     }
-    public init?(url:URL) {
-        guard let str = try? Swift.String(contentsOf: url) else { return nil }
-        guard let json = JSON(string:str) else { return nil }
-        self = json
+    public init(url:URL) {
+        do {
+            let str = try Swift.String(contentsOf: url)
+            self = JSON(string:str)
+        } catch {
+            self = .Error(.nsError(error as NSError))
+        }
     }
     public var data:Data {
         return self.description.data(using:.utf8)!
@@ -152,7 +166,7 @@ extension JSON {
         }
     }
     public var isNull:Bool          { return type == .null }
-    public var error:ErrorType?     { switch self { case .Error(let v): return v default: return nil } }
+    public var error:JSONError?     { switch self { case .Error(let v): return v default: return nil } }
     public var bool:Bool? {
         get { switch self { case .Bool(let v):  return v default: return nil } }
         set { self = .Bool(newValue!) }
@@ -179,10 +193,10 @@ extension JSON {
         get {
             switch self {
             case .Array(let a):
-                guard idx < a.count else { return .Error("subscript \(idx) is out of 0..<(v.count)") }
+                guard idx < a.count else { return .Error(.indexOutOfRange(idx)) }
                 return a[idx]
             default:
-                return .Error("\"\(self)\" is not an array")
+                return .Error(.typeMismatch(self.type))
             }
         }
         set {
@@ -206,9 +220,9 @@ extension JSON {
         get {
             switch self {
             case .Object(let o):
-                return o[key] ?? .Error("subscript \"\(key)\" is nonexistent")
+                return o[key] ?? .Error(.keyNonexistent(key))
             default:
-                return .Error("\"\(self)\" is not an object")
+                return .Error(.typeMismatch(self.type))
             }
         }
         set {
