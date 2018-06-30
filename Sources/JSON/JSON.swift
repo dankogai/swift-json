@@ -41,7 +41,9 @@ extension JSON : Hashable {
     }
 }
 extension JSON : CustomStringConvertible {
-    public var description:String {
+    public func toString(depth d:Int, separator s:String, terminator t:String, sortedKey:Bool=false)->String {
+        let i = Swift.String(repeating:s, count:d)
+        let g = s == "" ? "" : " "
         switch self {
         case .Error(let m):     return ".Error(\"\(m)\")"
         case .Null:             return "null"
@@ -49,14 +51,25 @@ extension JSON : CustomStringConvertible {
         case .Number(let v):    return v.description
         case .String(let v):    return v.debugDescription
         case .Array(let a):
-            return "[" + a.map{ $0.description }.joined(separator:",") + "]"
+            return "[" + t
+                + a.map{ $0.toString(depth:d+1, separator:s, terminator:t, sortedKey:sortedKey) }
+                    .map{ i + s + $0 }.joined(separator:","+t) + t
+                + i + "]" + (d == 0 ? t : "")
         case .Object(let o):
-            var ds = [Swift.String]()
-            for (k, v) in o {
-                ds.append(k.debugDescription + ":" + v.description)
-            }
-            return "{" + ds.joined(separator:",") + "}"
+            let a = sortedKey ? o.map{ $0 }.sorted{ $0.0 < $1.0 } : o.map{ $0 }
+            return "{" + t
+                + a.map { $0.debugDescription + g + ":" + g + $1.toString(depth:d+1, separator:s, terminator:t, sortedKey:sortedKey) }
+                    .map{ i + s + $0 }.joined(separator:"," + t) + t
+                + i + "}" + (d == 0 ? t : "")
         }
+    }
+    public func toString(space:Int=0)->String {
+        return space == 0
+            ? toString(depth:0, separator:"", terminator:"")
+            : toString(depth:0, separator:Swift.String(repeating:" ", count:space), terminator:"\n", sortedKey:true)
+    }
+    public var description:String {
+        return self.toString()
     }
 }
 // Inits
@@ -138,16 +151,7 @@ extension JSON {
         return self.description.data(using:.utf8)!
     }
     public var jsonObject:Any {
-        return try! JSONSerialization.jsonObject(with:self.data)
-    }
-    public func formatted(option:
-        JSONSerialization.WritingOptions=JSONSerialization.WritingOptions(rawValue: 0)
-        )->String {
-        let data = try! JSONSerialization.data(withJSONObject:self.jsonObject, options: option)
-        return Swift.String(data: data, encoding: .utf8)!
-    }
-    public var prettyPrinted:String {
-        return self.formatted(option:[.prettyPrinted])
+        return try! JSONSerialization.jsonObject(with:self.data, options:[.allowFragments])
     }
 }
 extension JSON {
@@ -242,12 +246,13 @@ extension JSON {
 }
 extension JSON : Sequence {
     public enum IteratorKey {
+        case None
         case Index(Int)
         case Key(String)
         public var index:Int?  { switch self { case .Index(let v): return v default: return nil } }
         public var key:String? { switch self { case .Key(let v):   return v default: return nil } }
     }
-    public typealias Element = (IteratorKey,JSON)  // for Sequence conformance
+    public typealias Element = (key:IteratorKey,value:JSON)  // for Sequence conformance
     public typealias Iterator = AnyIterator<Element>
     public func makeIterator() -> AnyIterator<JSON.Element> {
         switch self {
@@ -267,6 +272,9 @@ extension JSON : Sequence {
         default:
             return AnyIterator { nil }
         }
+    }
+    public func walk<R>(_ depth:Int, _ visit:(_:Element, _:Int)->R)->R {
+        return visit((.None, self), depth)
     }
 }
 extension JSON : Codable {
