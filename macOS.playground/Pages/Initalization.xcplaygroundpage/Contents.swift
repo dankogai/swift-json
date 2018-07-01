@@ -29,10 +29,9 @@ let str = """
         "null":null, "bool":false, "number":0, "string":"" ,"array":[], "object":{}
     },
     "url":"https://github.com/dankogai/"
-
 }
 """
-JSON(string:str)!   // failable
+JSON(string:str)
 
 //: …or a content of the URL…
 JSON(urlString:"https://api.github.com")

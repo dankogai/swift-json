@@ -40,6 +40,76 @@ json["bool"]    = false
 json["number"]  = 0
 json["string"]  = ""
 json["array"]   = []
-json["object"]  = {}
+json["object"]  = [:]
+
+//: #### deep traversal
+//: `JSON` is a recursive data type.  For recursive data types, you need a recursive method that traverses the data deep down.  For that purpuse, `JSON` offers `.pick` and `.walk`.
+
+//: `.pick` is a "`.deepFilter`" that filters recursively.  You've already seen it above.  It takes a filter function of type `(JSON)->Bool`.  That function is applied to all leaf values of the tree and leaves that do not meet the predicate are pruned.
+
+// because property list does not accept null
+let json4plist = json.pick{ !$0.isNull }
+
+
+//: `.walk` is a `deepMap` that transforms recursively.  This one is a little harder because you have to consider what to do on node and leaves separately.  To make your life easier three different forms of `.walk` are provided.  The first one just takes a leaf.
+
+JSON([0,[1,[2,3,[4,5,6]]], true]).walk {
+    guard let n = $0.number else { return $0 }
+    return JSON(n * n)
+}
+
+//: The second forms just takes a node.  Instead of explaining it, let me show you how `.pick` is implemented by extending `JSON` with `.select` that does exactly the same as `.pick`.
+
+extension JSON {
+    func select(picker:(JSON)->Bool)->JSON {
+        return self.walk{ node, pairs, depth in
+            switch node.type {
+            case .array:
+                return .Array(pairs.map{ $0.1 }.filter({ picker($0) }) )
+            case .object:
+                var o = [Key:Value]()
+                pairs.filter{ picker($0.1) }.forEach{ o[$0.0.key!] = $0.1 }
+                return .Object(o)
+            default:
+                return .Error(.notIterable(node.type))
+            }
+        }
+    }
+}
+
+//: And the last form takes both.  Unlike the previous ones this one can return other than `JSON`.  Here is a quick and dirty `.yaml` that emits a YAML.
+
+extension JSON {
+    var yaml:String {
+        return self.walk(depth:0, collect:{ node, pairs, depth in
+            let indent = Swift.String(repeating:"  ", count:depth)
+            var result = ""
+            switch node.type {
+            case .array:
+                guard !pairs.isEmpty else { return "[]"}
+                result = pairs.map{ "- " + $0.1}.map{indent + $0}.joined(separator: "\n")
+            case .object:
+                guard !pairs.isEmpty else { return "{}"}
+                result = pairs.sorted{ $0.0.key! < $1.0.key! }.map{
+                    let k = $0.0.key!
+                    let q = k.rangeOfCharacter(from: .newlines) != nil
+                    return (q ? k.debugDescription : k) + ": "  + $0.1
+                    }.map{indent + $0}.joined(separator: "\n")
+            default:
+                break   // never reaches here
+            }
+            return "\n" + result
+        },visit:{
+            if $0.isNull { return  "~" }
+            if let s = $0.string {
+                return s.rangeOfCharacter(from: .newlines) == nil ? s : s.debugDescription
+            }
+            return $0.description
+        })
+    }
+}
+
+//: and the second one just takes a node.
+//: 
 
 //: [Next](@next)

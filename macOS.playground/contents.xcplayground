@@ -3,6 +3,7 @@
     <pages>
         <page name='Synopsis'/>
         <page name='Initalization'/>
+        <page name='Conversion'/>
         <page name='Manipulation'/>
         <page name='Scratch'/>
     </pages>

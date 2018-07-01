@@ -22,7 +22,7 @@ This module is a lot like [SwiftyJSON] in functionality.  It wraps [JSONSerializ
 
 * SwiftyJSON's `JSON` is `struct`.  `JSON` of this module is `enum`
 * SwiftyJSON keeps the output of `JSONSerialization.jsonObject` in its stored property and convert its value runtime.  `JSON` of this module is static.  Definitely Swiftier.
-* SwiftyJSON's `JSON.swift` is over 1,500 lines while that of this module is less than 350 (as of this writing).  Since it is so compact you can use it without building framework.
+* SwiftyJSON's `JSON.swift` is over 1,500 lines while that of this module is less than 400 (as of this writing).  Since it is so compact you can use it without building framework.
 
 ### Initialization
 
@@ -77,6 +77,35 @@ import Foundation
 struct Point:Hashable, Codable { let (x, y):(Int, Int) }
 var data = try JSONEncoder().encode(Point(x:3, y:4))
 try JSONDecoder().decode(JSON.self, from:data)
+```
+
+### Conversion
+
+once you have the JSON object, converting to other formats is simple.
+
+to JSON string, all you need is stringify it.  .description or "\(json)" would be enough.
+
+```swift
+json.description
+"\(json)"				// JSON is CustomStringConvertible
+```
+
+If you need `Data`, simply call `.data`.
+
+```swift
+json.data
+```
+
+If you want to feed it (back) to `Foundation` framework, call `.jsonObject`
+
+```swift
+let json4plist = json.pick{ !$0.isNull }    // remove null
+let plistData = try PropertyListSerialization.data (
+    fromPropertyList:json4plist.jsonObject,
+    format:.xml,
+    options:0
+)
+print(String(data:plistData, encoding:.utf8)!)
 ```
 
 ### Manipulation
@@ -149,12 +178,88 @@ json = JSON([:])
 And manipulate intuitively like so.
 
 ```swift
-json["null"]    = nil
+json["null"]    = nil		// not null
 json["bool"]    = false
 json["number"]  = 0
 json["string"]  = ""
 json["array"]   = []
-json["object"]  = {}
+json["object"]  = [:]		// not {}
+```
+
+#### deep traversal
+
+`JSON` is a recursive data type.  For recursive data types, you need a recursive method that traverses the data deep down.  For that purpuse, `JSON` offers `.pick` and `.walk`.
+
+`.pick` is a "`.deepFilter`" that filters recursively.  You've already seen it above.  It takes a filter function of type `(JSON)->Bool`.  That function is applied to all leaf values of the tree and leaves that do not meet the predicate are pruned.
+
+```swift
+// because property list does not accept null
+let json4plist = json.pick{ !$0.isNull }
+```
+
+`.walk` is a `deepMap` that transforms recursively.  This one is a little harder because you have to consider what to do on node and leaves separately.  To make your life easier three different versions of `.walk` are provided.  The first one just takes a leaf node.
+
+```swift
+// square all numbers and leave anything else 
+JSON([0,[1,[2,3,[4,5,6]]], true]).walk {
+    guard let n = $0.number else { return $0 }
+    return JSON(n * n)
+}
+```
+
+The second forms just takes a node.  Instead of explaining it, let me show you how `.pick` is implemented by extending `JSON` with `.select` that does exactly the same as `.pick`.
+
+```swift
+extension JSON {
+    func select(picker:(JSON)->Bool)->JSON {
+        return self.walk{ node, pairs, depth in
+            switch node.type {
+            case .array:
+                return .Array(pairs.map{ $0.1 }.filter({ picker($0) }) )
+            case .object:
+                var o = [Key:Value]()
+                pairs.filter{ picker($0.1) }.forEach{ o[$0.0.key!] = $0.1 }
+                return .Object(o)
+            default:
+                return .Error(.notIterable(node.type))
+            }
+        }
+    }
+}
+```
+
+And the last form takes both.  Unlike the previous ones this one can return other than `JSON`.  Here is a quick and dirty `.yaml` that emits a YAML.
+
+```swift
+extension JSON {
+    var yaml:String {
+        return self.walk(depth:0, collect:{ node, pairs, depth in
+            let indent = Swift.String(repeating:"  ", count:depth)
+            var result = ""
+            switch node.type {
+            case .array:
+                guard !pairs.isEmpty else { return "[]"}
+                result = pairs.map{ "- " + $0.1}.map{indent + $0}.joined(separator: "\n")
+            case .object:
+                guard !pairs.isEmpty else { return "{}"}
+                result = pairs.sorted{ $0.0.key! < $1.0.key! }.map{
+                    let k = $0.0.key!
+                    let q = k.rangeOfCharacter(from: .newlines) != nil
+                    return (q ? k.debugDescription : k) + ": "  + $0.1
+                    }.map{indent + $0}.joined(separator: "\n")
+            default:
+                break   // never reaches here
+            }
+            return "\n" + result
+        },visit:{
+            if $0.isNull { return  "~" }
+            if let s = $0.string {
+                return s.rangeOfCharacter(from: .newlines) == nil ? s : s.debugDescription
+            }
+            return $0.description
+        })
+    }
+}
 ```
 
 ### Protocol Conformance
@@ -177,22 +282,27 @@ JSON(string:foo) == JSON(urlString:"https://example.com/whereever")
 * `JSON` is `Sequence`.  But when you iterate, be careful with the key.
 
 ```swift
+let ja:JSON = [nil, true, 1, "one", [1], ["one":1]]
 // wrong!
-for v in JSON([nil, true, 1, "one", [1], ["one":1]]) {
+for v in ja {
 	//
 }
 ```
 
 ```swift
 // right!
-for (i, v) in JSON([nil, true, 1, "one", [1], ["one":1]]) {
+for (i, v) in ja {
 	// i is NOT an Integer but KeyType.Index.
 	// To access its value, say i.index
 }
-for (k, v) in JSON([
-        "null":nil, "bool":false, "number":0, "string":"" ,
-        "array":[], "object":[:]
-    ]) {
+```
+
+```swift
+let jo:JSON = [
+    "null":nil, "bool":false, "number":0, "string":"",
+    "array":[], "object":[:]
+]
+for (k, v) in jo {
 	// k is NOT an Integer but KeyType.Key.
 	// To access its value, say i.key
 }
@@ -202,13 +312,13 @@ for (k, v) in JSON([
 That is because swift demands to return same `Element` type.  If you feel this counterintuitive, you can simply use `.array` or `.object`:
 
 ```swift
-for v in JSON([nil, true, 1, "one", [1], ["one":1]]).array! {
+for v in ja.array! {
 	// ...
 }
-for (k, v) in JSON([
-        "null":nil, "bool":false, "number":0, "string":"" ,
-        "array":[], "object":[:]
-    ]).object! {
+```
+
+```swift
+for (k, v) in jo.object! {
 	// ...
 }
 
