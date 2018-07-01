@@ -11,7 +11,8 @@ import Foundation
 public enum JSON:Equatable {
     public enum JSONError : Equatable {
         case notAJSONObject
-        case typeMismatch(JSON.ContentType)
+        case notIterable(JSON.ContentType)
+        case notSubscriptable(JSON.ContentType)
         case indexOutOfRange(JSON.Index)
         case keyNonexistent(JSON.Key)
         case nsError(NSError)
@@ -191,6 +192,9 @@ extension JSON {
         get { switch self { case .Object(let v):return v default: return nil } }
         set { self = .Object(newValue!) }
     }
+    public var isIterable:Bool {
+        return type == .array || type == .object
+    }
 }
 extension JSON {
     public subscript(_ idx:Index)->JSON {
@@ -202,7 +206,7 @@ extension JSON {
                 guard idx < a.count else { return .Error(.indexOutOfRange(idx)) }
                 return a[idx]
             default:
-                return .Error(.typeMismatch(self.type))
+                return .Error(.notSubscriptable(self.type))
             }
         }
         set {
@@ -230,7 +234,7 @@ extension JSON {
             case .Object(let o):
                 return o[key] ?? .Error(.keyNonexistent(key))
             default:
-                return .Error(.typeMismatch(self.type))
+                return .Error(.notSubscriptable(self.type))
             }
         }
         set {
@@ -273,8 +277,43 @@ extension JSON : Sequence {
             return AnyIterator { nil }
         }
     }
-    public func walk<R>(_ depth:Int, _ visit:(_:Element, _:Int)->R)->R {
-        return visit((.None, self), depth)
+    public func walk<R>(depth:Int=0, collect:(JSON, [(IteratorKey, R)], Int)->R, visit:(JSON)->R)->R {
+        return collect(self, self.map {
+            let value = $0.1.isIterable ? $0.1.walk(depth:depth+1, collect:collect, visit:visit)
+            : visit($0.1)
+            return ($0.0, value)
+        }, depth)
+    }
+    public func walk(depth:Int=0, visit:(JSON)->JSON)->JSON {
+        return self.walk(depth:depth, collect:{ node,pairs,depth in
+            switch node.type {
+            case .array:
+                return .Array(pairs.map{ $0.1 })
+            case .object:
+                var o = [Key:Value]()
+                pairs.forEach{ o[$0.0.key!] = $0.1 }
+                return .Object(o)
+            default:
+                return .Error(.notIterable(node.type))
+            }
+        }, visit:visit)
+    }
+    public func walk(depth:Int=0, collect:(JSON, [Element], Int)->JSON)->JSON {
+        return self.walk(depth:depth, collect:collect, visit:{ $0 })
+    }
+    public func pick(picker:(JSON)->Bool)->JSON {
+        return self.walk{ node, pairs, depth in
+            switch node.type {
+            case .array:
+                return .Array(pairs.map{ $0.1 }.filter({ picker($0) }) )
+            case .object:
+                var o = [Key:Value]()
+                pairs.filter{ picker($0.1) }.forEach{ o[$0.0.key!] = $0.1 }
+                return .Object(o)
+            default:
+                return .Error(.notIterable(node.type))
+            }
+        }
     }
 }
 extension JSON : Codable {
@@ -331,12 +370,13 @@ extension JSON : Codable {
 }
 extension JSON.JSONError : CustomStringConvertible {
     public enum ErrorType {
-        case notAJSONObject, typeMismatch, indexOutOfRange, keyNonexistent, nsError
+        case notAJSONObject, notIterable, notSubscriptable, indexOutOfRange, keyNonexistent, nsError
     }
     public var type:ErrorType {
         switch self {
         case .notAJSONObject:       return .notAJSONObject
-        case .typeMismatch(_):      return .typeMismatch
+        case .notIterable:          return .notIterable
+        case .notSubscriptable(_):  return .notSubscriptable
         case .indexOutOfRange(_):   return .indexOutOfRange
         case .keyNonexistent(_):    return .keyNonexistent
         case .nsError(_):           return .nsError
@@ -346,7 +386,8 @@ extension JSON.JSONError : CustomStringConvertible {
     public var description:String {
         switch self {
         case .notAJSONObject:           return "not an jsonObject"
-        case .typeMismatch(let t):      return "\(t) is not an array"
+        case .notIterable(let t):       return "\(t) is not iterable"
+        case .notSubscriptable(let t):  return "\(t) cannot be subscripted"
         case .indexOutOfRange(let i):   return "index \(i) is out of range"
         case .keyNonexistent(let k):    return "key \"\(k)\" does not exist"
         case .nsError(let e):           return "\(e)"
