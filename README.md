@@ -1,5 +1,5 @@
 
-* OBSOLETED by [swift-sion]
+# OBSOLETED by [swift-sion]
 
 [swift-sion] can do all what `swift-json` can do plus:
 
