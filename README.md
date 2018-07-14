@@ -1,3 +1,21 @@
+
+* OBSOLETED by [swift-sion]
+
+[swift-sion] can do all what `swift-json` can do plus:
+
+* Handles [SION], which is a "JSON++" with support for more data types.
+* Conversion betwen:
+  * JSON
+  * Property List
+  * MsgPack
+  * YAML (output only)
+
+* https://github.com/dankogai/swift-sion
+
+[swift-sion]: https://github.com/dankogai/swift-sion
+[SION]: https://dankogai.github.io/SION
+[MsgPack]: https://msgpack.org
+
 [![Swift 4.1](https://img.shields.io/badge/swift-4.1-brightgreen.svg)](https://swift.org)
 [![MIT LiCENSE](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
 [![build status](https://secure.travis-ci.org/dankogai/swift-json.png)](http://travis-ci.org/dankogai/swift-json)
